@@ -1,0 +1,17 @@
+
+.vs/
+*.user
+*.userosscache
+*.sln.docstates
+
+[Bb]in/
+[Oo]bj/
+TestResults/
+
+project.lock.json
+project.assets.json
+*.nuget.props
+*.nuget.targets
+
+appsettings.json
+appsettings.Development.json

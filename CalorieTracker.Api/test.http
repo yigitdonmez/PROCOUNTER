@@ -1,0 +1,4 @@
+POST http://localhost:5119/api/analyze-food
+Content-Type: application/json
+
+"Sabah 2 haşlanmış yumurta ve 1 dilim kepek ekmek yedim"

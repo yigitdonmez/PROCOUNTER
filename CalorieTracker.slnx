@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="CalorieTracker.Api/CalorieTracker.Api.csproj" />
+  <Project Path="CalorieTracker.Mobile/CalorieTracker.Mobile.csproj" />
+  <Project Path="CalorieTracker.Shared/CalorieTracker.Shared.csproj" />
+</Solution>

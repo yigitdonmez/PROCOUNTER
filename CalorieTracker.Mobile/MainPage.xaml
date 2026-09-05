@@ -1,0 +1,65 @@
+﻿<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="CalorieTracker.Mobile.MainPage"
+             BackgroundColor="#0F0F13">
+
+    <Grid RowDefinitions="Auto, Auto, Auto, Auto, *" Padding="15,40,15,0">
+
+        <Label Grid.Row="0" Text="PROCOUNTER" TextColor="#B900FF" FontSize="20" FontAttributes="Bold" CharacterSpacing="5" HorizontalOptions="Center" Margin="0,0,0,20"/>   
+
+        <Grid Grid.Row="1" ColumnDefinitions="Auto, Auto" Margin="0,0,0,20" HorizontalOptions="Center" ColumnSpacing="30">
+            <VerticalStackLayout Grid.Column="0" VerticalOptions="Center">
+                <Label Text="GÜNLÜK TOPLAM" TextColor="#888" FontSize="12" CharacterSpacing="2" HorizontalOptions="Center"/>
+                <Label Text="{Binding TotalCalories, StringFormat='{0:0.##}'}" TextColor="White" FontSize="56" FontAttributes="Bold" HorizontalOptions="Center"/>
+                <Label Text="KCAL" TextColor="#B900FF" FontSize="14" FontAttributes="Bold" HorizontalOptions="Center"/>
+            </VerticalStackLayout>
+            <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="10">
+                <HorizontalStackLayout Spacing="15">
+                    <Label Text="PROTEİN" TextColor="#666" FontSize="12" FontAttributes="Bold" WidthRequest="70" VerticalOptions="Center"/>
+                    <Label Text="{Binding TotalProtein, StringFormat='{0:0.##}g'}" TextColor="#00E5FF" FontSize="18" FontAttributes="Bold" VerticalOptions="Center"/>
+                </HorizontalStackLayout>
+                <HorizontalStackLayout Spacing="15">
+                    <Label Text="KARB" TextColor="#666" FontSize="12" FontAttributes="Bold" WidthRequest="70" VerticalOptions="Center"/>
+                    <Label Text="{Binding TotalCarbs, StringFormat='{0:0.##}g'}" TextColor="#00E5FF" FontSize="18" FontAttributes="Bold" VerticalOptions="Center"/>
+                </HorizontalStackLayout>
+                <HorizontalStackLayout Spacing="15">
+                    <Label Text="YAĞ" TextColor="#666" FontSize="12" FontAttributes="Bold" WidthRequest="70" VerticalOptions="Center"/>
+                    <Label Text="{Binding TotalFat, StringFormat='{0:0.##}g'}" TextColor="#00E5FF" FontSize="18" FontAttributes="Bold" VerticalOptions="Center"/>
+                </HorizontalStackLayout>
+            </VerticalStackLayout>
+        </Grid>
+
+        <Frame Grid.Row="2" BackgroundColor="#1E1E24" CornerRadius="12" Padding="5" HasShadow="False" BorderColor="Transparent" Margin="0,0,0,15">
+            <Grid ColumnDefinitions="*, Auto">
+                <Entry x:Name="FoodInput" Grid.Column="0" Placeholder="Örn: Akşam 1 porsiyon iskender" TextColor="White" PlaceholderColor="#555" BackgroundColor="Transparent"/>
+                <Button Grid.Column="1" Text="Ekle" BackgroundColor="#B900FF" TextColor="White" CornerRadius="8" FontAttributes="Bold" Clicked="OnAddFoodClicked"/>
+            </Grid>
+        </Frame>
+
+        <Grid Grid.Row="3" ColumnDefinitions="*, Auto" Margin="0,0,0,10">
+            <Label Text="TÜKETİLENLER" TextColor="#888" FontSize="12" FontAttributes="Bold" VerticalOptions="Center" CharacterSpacing="1"/>
+            <Button Grid.Column="1" Text="Sırala ↕" BackgroundColor="#222" TextColor="White" FontSize="12" Padding="15,5" CornerRadius="6" Clicked="OnSortClicked"/>
+        </Grid>
+
+        <CollectionView Grid.Row="4" ItemsSource="{Binding FoodItems}" SelectionMode="Single" SelectionChanged="OnFoodItemSelected">
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <Frame BackgroundColor="#16161A" CornerRadius="10" Margin="0,0,0,10" Padding="15" BorderColor="#222" HasShadow="False">
+                        <Grid ColumnDefinitions="Auto, *, Auto">
+                            <Label Grid.Column="0" Text="{Binding DisplayMealType}" HorizontalTextAlignment="Center" TextColor="#B900FF" FontSize="11" FontAttributes="Bold" VerticalOptions="Center" Margin="0,0,15,0" WidthRequest="60"/>
+                            <VerticalStackLayout Grid.Column="1" VerticalOptions="Center">
+                                <Label Text="{Binding FoodName}" TextColor="White" FontSize="16" FontAttributes="Bold"/>
+                                <Label Text="{Binding Portion}" TextColor="#888" FontSize="12"/>
+                            </VerticalStackLayout>
+                            <HorizontalStackLayout Grid.Column="2" VerticalOptions="Center" Spacing="8">
+                                <Label Text="{Binding Calories, StringFormat='{0:0.##} kcal'}" TextColor="#00E5FF" FontSize="13" FontAttributes="Bold" VerticalOptions="Center"/>
+                                <Label Text="{Binding ProteinGrams, StringFormat='{0:0.##}P'}" TextColor="#888" FontSize="11" VerticalOptions="Center"/>
+                                <Label Text="{Binding CarbsGrams, StringFormat='{0:0.##}C'}" TextColor="#888" FontSize="11" VerticalOptions="Center"/>
+                            </HorizontalStackLayout>
+                        </Grid>
+                    </Frame>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+    </Grid>
+</ContentPage>
