@@ -32,11 +32,11 @@ public partial class MainPage : ContentPage, INotifyPropertyChanged
         BindingContext = this;
     }
 
-	private async void OnSortClicked(object sender, EventArgs e)
+	private async void OnSortClicked(object? sender, EventArgs e)
 	{
 		if (FoodItems.Count == 0) return;
 
-		string action = await DisplayActionSheet("Sıralama Ölçütü", "İptal", null, "Öğüne Göre", "Kaloriye Göre (En Yüksek)", "Proteine Göre (En Yüksek)", "Karbonhidrata Göre (En Yüksek)", "Yağa Göre (En Yüksek)", "İsme Göre (A-Z)");
+		string action = await DisplayActionSheetAsync("Sıralama Ölçütü", "İptal", null, "Öğüne Göre", "Kaloriye Göre (En Yüksek)", "Proteine Göre (En Yüksek)", "Karbonhidrata Göre (En Yüksek)", "Yağa Göre (En Yüksek)", "İsme Göre (A-Z)");
 
 		if (action == "İptal" || string.IsNullOrEmpty(action)) return;
 
@@ -71,7 +71,7 @@ public partial class MainPage : ContentPage, INotifyPropertyChanged
 		}
 	}
 
-    private async void OnAddFoodClicked(object sender, EventArgs e)
+    private async void OnAddFoodClicked(object? sender, EventArgs e)
 	{
 		string userInput = FoodInput.Text;
 		if (string.IsNullOrWhiteSpace(userInput)) return;
@@ -96,12 +96,12 @@ public partial class MainPage : ContentPage, INotifyPropertyChanged
 			else
 			{
 				string errorDetail = await response.Content.ReadAsStringAsync();
-				await DisplayAlert("API Hatası", $"Kodu: {response.StatusCode}\nDetay: {errorDetail}", "Tamam");
+				await DisplayAlertAsync("API Hatası", $"Kodu: {response.StatusCode}\nDetay: {errorDetail}", "Tamam");
 			}
 		}
 		catch (Exception ex)
 		{
-			await DisplayAlert("Bağlantı Hatası", ex.Message, "Tamam");
+			await DisplayAlertAsync("Bağlantı Hatası", ex.Message, "Tamam");
 		}
 	}
 
@@ -113,12 +113,12 @@ public partial class MainPage : ContentPage, INotifyPropertyChanged
 		TotalFat = FoodItems.Sum(f => f.FatGrams);
 	}
 
-	private async void OnFoodItemSelected(object sender, SelectionChangedEventArgs e)
+	private async void OnFoodItemSelected(object? sender, SelectionChangedEventArgs e)
 	{
 		if (e.CurrentSelection.FirstOrDefault() is not FoodItemDto selectedFood)
 			return;
 
-		string action = await DisplayActionSheet($"{selectedFood.FoodName} İşlemleri", "İptal", "Sil", "Gramajı Ayarla", "Öğünü Değiştir");
+		string action = await DisplayActionSheetAsync($"{selectedFood.FoodName} İşlemleri", "İptal", "Sil", "Gramajı Ayarla", "Öğünü Değiştir");
 
 		if (action == "Sil")
 		{
@@ -169,7 +169,7 @@ public partial class MainPage : ContentPage, INotifyPropertyChanged
 		}
 		else if (action == "Öğünü Değiştir")
 		{
-			string mealAction = await DisplayActionSheet("Öğün Seç", "İptal", null, "Sabah", "Ogle", "Aksam", "AraOgun", "BilinmeyenOgun");
+			string mealAction = await DisplayActionSheetAsync("Öğün Seç", "İptal", null, "Sabah", "Ogle", "Aksam", "AraOgun", "BilinmeyenOgun");
 			
 			if (mealAction != "İptal" && !string.IsNullOrEmpty(mealAction))
 			{
@@ -195,7 +195,10 @@ public partial class MainPage : ContentPage, INotifyPropertyChanged
 			}
 		}
 
-		((CollectionView)sender).SelectedItem = null;
+		if (sender is CollectionView collectionView)
+		{
+			collectionView.SelectedItem = null;
+		}
 	}
 
 	protected override async void OnAppearing()
@@ -241,13 +244,13 @@ public partial class MainPage : ContentPage, INotifyPropertyChanged
 			DateLabel.Text = _currentViewDate.ToString("dd MMMM dddd").ToUpper();
 	}
 
-	private async void OnPrevDayClicked(object sender, EventArgs e)
+	private async void OnPrevDayClicked(object? sender, EventArgs e)
 	{
 		_currentViewDate = _currentViewDate.AddDays(-1);
 		await LoadFoodsForDate(_currentViewDate);
 	}
 
-	private async void OnNextDayClicked(object sender, EventArgs e)
+	private async void OnNextDayClicked(object? sender, EventArgs e)
 	{
 		_currentViewDate = _currentViewDate.AddDays(1);
 		await LoadFoodsForDate(_currentViewDate);
