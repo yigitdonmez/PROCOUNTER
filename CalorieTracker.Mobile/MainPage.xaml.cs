@@ -24,6 +24,8 @@ public partial class MainPage : ContentPage, INotifyPropertyChanged
 
     private readonly HttpClient _httpClient = new();
 
+	private DateTime _currentViewDate = DateTime.Today;
+
     public MainPage()
     {
         InitializeComponent();
@@ -74,54 +76,32 @@ public partial class MainPage : ContentPage, INotifyPropertyChanged
 		string userInput = FoodInput.Text;
 		if (string.IsNullOrWhiteSpace(userInput)) return;
 
-		FoodInput.IsEnabled = false;
-
 		try
 		{
-			var response = await _httpClient.PostAsJsonAsync("http://localhost:5119/api/analyze-food", userInput);
-			
+			string dateQuery = _currentViewDate.ToString("yyyy-MM-dd");
+			string url = $"http://localhost:5119/api/analyze-food?date={dateQuery}";
+
+			var response = await _httpClient.PostAsJsonAsync(url, userInput);
+
 			if (response.IsSuccessStatusCode)
 			{
 				var returnedFoods = await response.Content.ReadFromJsonAsync<List<FoodItemDto>>();
-				
 				if (returnedFoods != null)
 				{
-					foreach (var food in returnedFoods)
-					{
-						FoodItems.Add(food);
-
-						TotalCalories += food.Calories;
-						TotalProtein += food.ProteinGrams;
-						TotalCarbs += food.CarbsGrams;
-						TotalFat += food.FatGrams;
-					}
+					foreach (var food in returnedFoods) FoodItems.Add(food);
+					RecalculateTotals();
+					FoodInput.Text = string.Empty;
 				}
-				FoodInput.Text = string.Empty;
 			}
 			else
 			{
-				string errorContent = await response.Content.ReadAsStringAsync();
-				string displayMessage = "API'den başarısız yanıt döndü.";
-
-				if (errorContent.Contains("sınırına ulaşıldı") || (int)response.StatusCode == 429)
-				{
-					displayMessage = "Gemini API sınırına (Rate Limit) ulaşıldı. Lütfen 1-2 dakika bekleyip tekrar deneyin.";
-				}
-				else
-				{
-					displayMessage = $"Sunucu Hatası: {response.StatusCode}";
-				}
-
-				await DisplayAlert("Hata", displayMessage, "Tamam");
+				string errorDetail = await response.Content.ReadAsStringAsync();
+				await DisplayAlert("API Hatası", $"Kodu: {response.StatusCode}\nDetay: {errorDetail}", "Tamam");
 			}
 		}
 		catch (Exception ex)
 		{
-			await DisplayAlert("Bağlantı Hatası", "API'ye ulaşılamadı. Sunucunun çalıştığından emin olun.\nDetay: " + ex.Message, "Tamam");
-		}
-		finally
-		{
-			FoodInput.IsEnabled = true;
+			await DisplayAlert("Bağlantı Hatası", ex.Message, "Tamam");
 		}
 	}
 
@@ -144,11 +124,13 @@ public partial class MainPage : ContentPage, INotifyPropertyChanged
 		{
 			FoodItems.Remove(selectedFood);
 			RecalculateTotals();
+			
+			await _httpClient.DeleteAsync($"http://localhost:5119/api/delete-food/{selectedFood.Id}");
 		}
 		else if (action == "Gramajı Ayarla")
 		{
-			var match = Regex.Match(selectedFood.Portion, @"[0-9]+([.,][0-9]+)?");
-			double currentAmount = 1;
+			var match = System.Text.RegularExpressions.Regex.Match(selectedFood.Portion, @"[0-9]+([.,][0-9]+)?");
+			double currentAmount = 1; 
 			string unit = selectedFood.Portion;
 
 			if (match.Success)
@@ -157,9 +139,7 @@ public partial class MainPage : ContentPage, INotifyPropertyChanged
 				unit = selectedFood.Portion.Replace(match.Value, "").Trim();
 			}
 
-			string result = await DisplayPromptAsync("Gramaj Ayarla", 
-				$"Mevcut: {selectedFood.Portion}\nYeni miktarı girin ({unit}):", 
-				initialValue: currentAmount.ToString());
+			string result = await DisplayPromptAsync("Gramaj Ayarla", $"Mevcut: {selectedFood.Portion}\nYeni miktarı girin ({unit}):", initialValue: currentAmount.ToString());
 			
 			if (!string.IsNullOrWhiteSpace(result) && double.TryParse(result.Replace(",", "."), System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out double newAmount) && newAmount > 0)
 			{
@@ -167,6 +147,8 @@ public partial class MainPage : ContentPage, INotifyPropertyChanged
 
 				var updatedFood = new FoodItemDto
 				{
+					Id = selectedFood.Id,
+					ConsumedDate = selectedFood.ConsumedDate,
 					OriginalQuery = selectedFood.OriginalQuery,
 					FoodName = selectedFood.FoodName,
 					IsFound = selectedFood.IsFound,
@@ -180,8 +162,9 @@ public partial class MainPage : ContentPage, INotifyPropertyChanged
 
 				int index = FoodItems.IndexOf(selectedFood);
 				FoodItems[index] = updatedFood;
-
 				RecalculateTotals();
+
+				await _httpClient.PutAsJsonAsync($"http://localhost:5119/api/update-food/{updatedFood.Id}", updatedFood);
 			}
 		}
 		else if (action == "Öğünü Değiştir")
@@ -192,6 +175,8 @@ public partial class MainPage : ContentPage, INotifyPropertyChanged
 			{
 				var updatedFood = new FoodItemDto
 				{
+					Id = selectedFood.Id,
+					ConsumedDate = selectedFood.ConsumedDate,
 					OriginalQuery = selectedFood.OriginalQuery,
 					FoodName = selectedFood.FoodName,
 					IsFound = selectedFood.IsFound,
@@ -205,9 +190,66 @@ public partial class MainPage : ContentPage, INotifyPropertyChanged
 
 				int index = FoodItems.IndexOf(selectedFood);
 				FoodItems[index] = updatedFood;
+
+				await _httpClient.PutAsJsonAsync($"http://localhost:5119/api/update-food/{updatedFood.Id}", updatedFood);
 			}
 		}
 
 		((CollectionView)sender).SelectedItem = null;
 	}
+
+	protected override async void OnAppearing()
+	{
+		base.OnAppearing();
+		await LoadFoodsForDate(_currentViewDate);
+	}
+
+	private async Task LoadFoodsForDate(DateTime targetDate)
+	{
+		UpdateDateUI();
+		FoodItems.Clear();
+
+		try
+		{
+			string dateString = targetDate.ToString("yyyy-MM-dd");
+			var savedFoods = await _httpClient.GetFromJsonAsync<List<FoodItemDto>>($"http://localhost:5119/api/get-foods/{dateString}");
+
+			if (savedFoods != null)
+			{
+				foreach (var food in savedFoods) FoodItems.Add(food);
+				RecalculateTotals();
+			}
+		}
+		catch {}
+	}
+
+	private void UpdateDateUI()
+	{
+		bool canGoBack = _currentViewDate > DateTime.Today.AddDays(-7);
+		PrevDayButton.IsEnabled = canGoBack;
+		PrevDayButton.TextColor = canGoBack ? Color.FromArgb("#B900FF") : Color.FromArgb("#444444");
+		
+		bool canGoForward = _currentViewDate < DateTime.Today;
+		NextDayButton.IsEnabled = canGoForward;
+		NextDayButton.TextColor = canGoForward ? Color.FromArgb("#B900FF") : Color.FromArgb("#444444");
+
+		if (_currentViewDate == DateTime.Today)
+			DateLabel.Text = "BUGÜN";
+		else if (_currentViewDate == DateTime.Today.AddDays(-1))
+			DateLabel.Text = "DÜN";
+		else
+			DateLabel.Text = _currentViewDate.ToString("dd MMMM dddd").ToUpper();
+	}
+
+	private async void OnPrevDayClicked(object sender, EventArgs e)
+	{
+		_currentViewDate = _currentViewDate.AddDays(-1);
+		await LoadFoodsForDate(_currentViewDate);
+	}
+
+	private async void OnNextDayClicked(object sender, EventArgs e)
+	{
+		_currentViewDate = _currentViewDate.AddDays(1);
+		await LoadFoodsForDate(_currentViewDate);
+	}	
 }

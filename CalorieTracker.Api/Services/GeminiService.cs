@@ -65,6 +65,7 @@ public class GeminiService
             .GetString();
 
         var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+        if (string.IsNullOrWhiteSpace(jsonText)) return new List<FoodItemDto>();
         return JsonSerializer.Deserialize<List<FoodItemDto>>(jsonText, options) ?? new List<FoodItemDto>();
     }
 }

@@ -26,4 +26,6 @@ public class FoodItemDto
             };
         } 
     }
+    public int Id { get; set; } 
+    public DateTime ConsumedDate { get; set; } = DateTime.Today;
 }

@@ -3,11 +3,19 @@
              x:Class="CalorieTracker.Mobile.MainPage"
              BackgroundColor="#0F0F13">
 
-    <Grid RowDefinitions="Auto, Auto, Auto, Auto, *" Padding="15,40,15,0">
+    <Grid RowDefinitions="Auto, Auto, Auto, Auto, Auto, *" Padding="15,5,15,0">
 
-        <Label Grid.Row="0" Text="PROCOUNTER" TextColor="#B900FF" FontSize="20" FontAttributes="Bold" CharacterSpacing="5" HorizontalOptions="Center" Margin="0,0,0,20"/>   
+        <Label Grid.Row="0" Text="PROCOUNTER" TextColor="#B900FF" FontSize="14" CharacterSpacing="10" HorizontalOptions="Center" Margin="0,0,0,10"/>
 
-        <Grid Grid.Row="1" ColumnDefinitions="Auto, Auto" Margin="0,0,0,20" HorizontalOptions="Center" ColumnSpacing="30">
+        <Grid Grid.Row="1" ColumnDefinitions="Auto, *, Auto" Margin="0,0,0,15" VerticalOptions="Center">
+            <Button x:Name="PrevDayButton" Grid.Column="0" Text="&lt;" BackgroundColor="Transparent" TextColor="#B900FF" FontSize="28" FontAttributes="Bold" Clicked="OnPrevDayClicked" Padding="10,0"/>
+            
+            <Label x:Name="DateLabel" Grid.Column="1" Text="BUGÜN" TextColor="#B900FF" FontSize="18" FontAttributes="Bold" CharacterSpacing="2" HorizontalOptions="Center" VerticalOptions="Center"/>
+            
+            <Button x:Name="NextDayButton" Grid.Column="2" Text="&gt;" BackgroundColor="Transparent" TextColor="#B900FF" FontSize="28" FontAttributes="Bold" Clicked="OnNextDayClicked" Padding="10,0"/>
+        </Grid> 
+
+        <Grid Grid.Row="2" ColumnDefinitions="Auto, Auto" Margin="0,0,0,20" HorizontalOptions="Center" ColumnSpacing="30">
             <VerticalStackLayout Grid.Column="0" VerticalOptions="Center">
                 <Label Text="GÜNLÜK TOPLAM" TextColor="#888" FontSize="12" CharacterSpacing="2" HorizontalOptions="Center"/>
                 <Label Text="{Binding TotalCalories, StringFormat='{0:0.##}'}" TextColor="White" FontSize="56" FontAttributes="Bold" HorizontalOptions="Center"/>
@@ -15,49 +23,62 @@
             </VerticalStackLayout>
             <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="10">
                 <HorizontalStackLayout Spacing="15">
-                    <Label Text="PROTEİN" TextColor="#666" FontSize="12" FontAttributes="Bold" WidthRequest="70" VerticalOptions="Center"/>
+                    <Label Text="PROTEİN" TextColor="#666" FontSize="12" FontAttributes="Bold" WidthRequest="60" VerticalOptions="Center"/>
                     <Label Text="{Binding TotalProtein, StringFormat='{0:0.##}g'}" TextColor="#00E5FF" FontSize="18" FontAttributes="Bold" VerticalOptions="Center"/>
                 </HorizontalStackLayout>
                 <HorizontalStackLayout Spacing="15">
-                    <Label Text="KARB" TextColor="#666" FontSize="12" FontAttributes="Bold" WidthRequest="70" VerticalOptions="Center"/>
+                    <Label Text="KARB" TextColor="#666" FontSize="12" FontAttributes="Bold" WidthRequest="60" VerticalOptions="Center"/>
                     <Label Text="{Binding TotalCarbs, StringFormat='{0:0.##}g'}" TextColor="#00E5FF" FontSize="18" FontAttributes="Bold" VerticalOptions="Center"/>
                 </HorizontalStackLayout>
                 <HorizontalStackLayout Spacing="15">
-                    <Label Text="YAĞ" TextColor="#666" FontSize="12" FontAttributes="Bold" WidthRequest="70" VerticalOptions="Center"/>
+                    <Label Text="YAĞ" TextColor="#666" FontSize="12" FontAttributes="Bold" WidthRequest="60" VerticalOptions="Center"/>
                     <Label Text="{Binding TotalFat, StringFormat='{0:0.##}g'}" TextColor="#00E5FF" FontSize="18" FontAttributes="Bold" VerticalOptions="Center"/>
                 </HorizontalStackLayout>
             </VerticalStackLayout>
         </Grid>
 
-        <Frame Grid.Row="2" BackgroundColor="#1E1E24" CornerRadius="12" Padding="5" HasShadow="False" BorderColor="Transparent" Margin="0,0,0,15">
+        <Border Grid.Row="3" BackgroundColor="#1E1E24" Padding="5" Stroke="Transparent" StrokeThickness="0" Margin="0,0,0,15">
+            <Border.StrokeShape>
+                <RoundRectangle CornerRadius="12" />
+            </Border.StrokeShape>
             <Grid ColumnDefinitions="*, Auto">
                 <Entry x:Name="FoodInput" Grid.Column="0" Placeholder="Örn: Akşam 1 porsiyon iskender" TextColor="White" PlaceholderColor="#555" BackgroundColor="Transparent"/>
                 <Button Grid.Column="1" Text="Ekle" BackgroundColor="#B900FF" TextColor="White" CornerRadius="8" FontAttributes="Bold" Clicked="OnAddFoodClicked"/>
             </Grid>
-        </Frame>
+        </Border>
 
-        <Grid Grid.Row="3" ColumnDefinitions="*, Auto" Margin="0,0,0,10">
+        <Grid Grid.Row="4" ColumnDefinitions="*, Auto" Margin="0,0,0,10">
             <Label Text="TÜKETİLENLER" TextColor="#888" FontSize="12" FontAttributes="Bold" VerticalOptions="Center" CharacterSpacing="1"/>
             <Button Grid.Column="1" Text="Sırala ↕" BackgroundColor="#222" TextColor="White" FontSize="12" Padding="15,5" CornerRadius="6" Clicked="OnSortClicked"/>
         </Grid>
 
-        <CollectionView Grid.Row="4" ItemsSource="{Binding FoodItems}" SelectionMode="Single" SelectionChanged="OnFoodItemSelected">
+        <CollectionView Grid.Row="5" ItemsSource="{Binding FoodItems}" SelectionMode="Single" SelectionChanged="OnFoodItemSelected">
             <CollectionView.ItemTemplate>
                 <DataTemplate>
-                    <Frame BackgroundColor="#16161A" CornerRadius="10" Margin="0,0,0,10" Padding="15" BorderColor="#222" HasShadow="False">
+                    <Border BackgroundColor="#16161A" Margin="0,0,0,10" Padding="12" Stroke="#222" StrokeThickness="1">
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="10" />
+                        </Border.StrokeShape>
                         <Grid ColumnDefinitions="Auto, *, Auto">
-                            <Label Grid.Column="0" Text="{Binding DisplayMealType}" HorizontalTextAlignment="Center" TextColor="#B900FF" FontSize="11" FontAttributes="Bold" VerticalOptions="Center" Margin="0,0,15,0" WidthRequest="60"/>
-                            <VerticalStackLayout Grid.Column="1" VerticalOptions="Center">
-                                <Label Text="{Binding FoodName}" TextColor="White" FontSize="16" FontAttributes="Bold"/>
+                            
+                            <Label Grid.Column="0" Text="{Binding DisplayMealType}" HorizontalTextAlignment="Center" TextColor="#B900FF" FontSize="11" FontAttributes="Bold" VerticalOptions="Center" Margin="0,0,10,0" WidthRequest="45"/>
+                            
+                            <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Margin="0,0,10,0">
+                                <Label Text="{Binding FoodName}" TextColor="White" FontSize="15" FontAttributes="Bold" LineBreakMode="TailTruncation" MaxLines="2"/>
                                 <Label Text="{Binding Portion}" TextColor="#888" FontSize="12"/>
                             </VerticalStackLayout>
-                            <HorizontalStackLayout Grid.Column="2" VerticalOptions="Center" Spacing="8">
-                                <Label Text="{Binding Calories, StringFormat='{0:0.##} kcal'}" TextColor="#00E5FF" FontSize="13" FontAttributes="Bold" VerticalOptions="Center"/>
-                                <Label Text="{Binding ProteinGrams, StringFormat='{0:0.##}P'}" TextColor="#888" FontSize="11" VerticalOptions="Center"/>
-                                <Label Text="{Binding CarbsGrams, StringFormat='{0:0.##}C'}" TextColor="#888" FontSize="11" VerticalOptions="Center"/>
-                            </HorizontalStackLayout>
+                            
+                            <VerticalStackLayout Grid.Column="2" VerticalOptions="Center" Spacing="4" HorizontalOptions="End">
+                                <Label Text="{Binding Calories, StringFormat='{0:0.##} kcal'}" TextColor="#00E5FF" FontSize="14" FontAttributes="Bold" HorizontalOptions="End"/>
+                                <HorizontalStackLayout Spacing="6" HorizontalOptions="End">
+                                    <Label Text="{Binding ProteinGrams, StringFormat='{0:0.##}P'}" TextColor="#888" FontSize="11"/>
+                                    <Label Text="{Binding CarbsGrams, StringFormat='{0:0.##}C'}" TextColor="#888" FontSize="11"/>
+                                    <Label Text="{Binding FatGrams, StringFormat='{0:0.##}Y'}" TextColor="#888" FontSize="11"/>
+                                </HorizontalStackLayout>
+                            </VerticalStackLayout>
+                            
                         </Grid>
-                    </Frame>
+                    </Border>
                 </DataTemplate>
             </CollectionView.ItemTemplate>
         </CollectionView>
