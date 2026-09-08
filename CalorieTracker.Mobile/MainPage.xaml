@@ -15,6 +15,23 @@
             <Button x:Name="NextDayButton" Grid.Column="2" Text="&gt;" BackgroundColor="Transparent" TextColor="#B900FF" FontSize="28" FontAttributes="Bold" Clicked="OnNextDayClicked" Padding="10,0"/>
         </Grid> 
 
+        <Grid Grid.Row="2" WidthRequest="0" HeightRequest="0" VerticalOptions="Center" HorizontalOptions="Center" ZIndex="-1">
+            <Ellipse x:Name="GlowEffect" 
+                    WidthRequest="400" HeightRequest="400" 
+                    HorizontalOptions="Center" VerticalOptions="Center"
+                    InputTransparent="True" 
+                    Opacity="0"
+                    Scale="0.9">
+                <Ellipse.Fill>
+                    <RadialGradientBrush>
+                        <GradientStop x:Name="GlowCenter" Color="Transparent" Offset="0.0" />
+                        <GradientStop x:Name="GlowMid" Color="Transparent" Offset="0.45" />
+                        <GradientStop Color="Transparent" Offset="1.0" />
+                    </RadialGradientBrush>
+                </Ellipse.Fill>
+            </Ellipse>
+        </Grid>
+
         <Grid Grid.Row="2" ColumnDefinitions="Auto, Auto" Margin="0,0,0,20" HorizontalOptions="Center" ColumnSpacing="30">
             <VerticalStackLayout Grid.Column="0" VerticalOptions="Center">
                 <Label Text="GÜNLÜK TOPLAM" TextColor="#888" FontSize="12" CharacterSpacing="2" HorizontalOptions="Center"/>

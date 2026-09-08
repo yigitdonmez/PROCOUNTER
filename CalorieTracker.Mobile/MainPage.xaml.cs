@@ -25,6 +25,8 @@ public partial class MainPage : ContentPage, INotifyPropertyChanged
     private readonly HttpClient _httpClient = new();
 
 	private DateTime _currentViewDate = DateTime.Today;
+	private bool _isGlowBreathing = false;
+	private Color _currentGlowColor = Colors.Transparent;
 
     public MainPage()
     {
@@ -111,6 +113,8 @@ public partial class MainPage : ContentPage, INotifyPropertyChanged
 		TotalProtein = FoodItems.Sum(f => f.ProteinGrams);
 		TotalCarbs = FoodItems.Sum(f => f.CarbsGrams);
 		TotalFat = FoodItems.Sum(f => f.FatGrams);
+
+		UpdateDynamicEffects(TotalCalories);
 	}
 
 	private async void OnFoodItemSelected(object? sender, SelectionChangedEventArgs e)
@@ -254,5 +258,94 @@ public partial class MainPage : ContentPage, INotifyPropertyChanged
 	{
 		_currentViewDate = _currentViewDate.AddDays(1);
 		await LoadFoodsForDate(_currentViewDate);
-	}	
+	}
+
+	private void UpdateDynamicEffects(double totalCalories)
+	{
+		Color targetColor = GetTargetGlowColor(totalCalories);
+
+		if (totalCalories >= 500 && GlowEffect.Opacity == 0)
+		{
+			GlowEffect.FadeTo(0.8, 1000, Easing.CubicOut);
+		}
+		else if (totalCalories < 500)
+		{
+			GlowEffect.FadeTo(0, 1000, Easing.CubicOut);
+			_isGlowBreathing = false;
+		}
+
+		if (totalCalories >= 500)
+		{
+			AnimateColorTransition(targetColor);
+		}
+
+		if (totalCalories >= 500 && !_isGlowBreathing)
+		{
+			_isGlowBreathing = true;
+			StartBreathingAnimation();
+		}
+	}
+
+	private Color GetTargetGlowColor(double calories)
+	{
+		if (calories < 500) return Colors.Transparent;
+		
+		if (calories >= 500 && calories <= 1000) return Color.FromArgb("#00FF00"); 
+
+		if (calories > 1000 && calories <= 2000)
+			return LerpColor(Color.FromArgb("#00FF00"), Color.FromArgb("#FFFF00"), (calories - 1000) / 1000.0);
+
+		if (calories > 2000 && calories <= 3000)
+			return LerpColor(Color.FromArgb("#FFFF00"), Color.FromArgb("#FF0000"), (calories - 2000) / 1000.0);
+
+		return Color.FromArgb("#FF0000"); 
+	}
+
+	private Color LerpColor(Color start, Color end, double fraction)
+	{
+		var r = start.Red + (end.Red - start.Red) * fraction;
+		var g = start.Green + (end.Green - start.Green) * fraction;
+		var b = start.Blue + (end.Blue - start.Blue) * fraction;
+		return Color.FromRgba(r, g, b, 1.0);
+	}
+
+	private void AnimateColorTransition(Color targetColor)
+	{
+		if (_currentGlowColor == targetColor) return;
+
+		var startColor = _currentGlowColor;
+		this.AbortAnimation("GlowColorAnim"); 
+
+		var animation = new Animation(v =>
+		{
+			var r = startColor.Red + (targetColor.Red - startColor.Red) * v;
+			var g = startColor.Green + (targetColor.Green - startColor.Green) * v;
+			var b = startColor.Blue + (targetColor.Blue - startColor.Blue) * v;
+			
+			_currentGlowColor = Color.FromRgba(r, g, b, 1.0);
+			
+			GlowCenter.Color = _currentGlowColor.WithAlpha(0.25f); 
+			GlowMid.Color = _currentGlowColor.WithAlpha(0.08f);
+		}, 0, 1);
+
+		animation.Commit(this, "GlowColorAnim", 16, 800, Easing.CubicOut);
+	}
+
+	private async void StartBreathingAnimation()
+	{
+		while (_isGlowBreathing)
+		{
+			await Task.WhenAll(
+				GlowEffect.ScaleTo(1.05, 1800, Easing.SinInOut),
+				GlowEffect.FadeTo(0.9, 1800, Easing.SinInOut)
+			);
+
+			if (!_isGlowBreathing) break;
+
+			await Task.WhenAll(
+				GlowEffect.ScaleTo(0.95, 1800, Easing.SinInOut),
+				GlowEffect.FadeTo(0.6, 1800, Easing.SinInOut)
+			);
+		}
+	}
 }
