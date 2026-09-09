@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 
 public class FoodItemDto
 {
+    public string UserId { get; set; } = string.Empty;
     public string OriginalQuery { get; set; } = string.Empty;
 
     [Required(ErrorMessage = "Yiyecek ismi boş bırakılamaz.")]

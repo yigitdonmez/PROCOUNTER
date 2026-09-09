@@ -2,6 +2,7 @@
 using System.ComponentModel;
 using System.Text.RegularExpressions;
 using System.Net.Http.Json;
+using System.Net.Http.Headers;
 using CalorieTracker.Shared;
 
 namespace CalorieTracker.Mobile;
@@ -23,7 +24,11 @@ public partial class MainPage : ContentPage, INotifyPropertyChanged
     public double TotalFat { get => _totalFat; set { _totalFat = value; OnPropertyChanged(); } }
 
     private readonly HttpClient _httpClient = new();
-
+    
+    // MAUI projesini fiziksel cihazda çalıştırırken localhost yerine bilgisayarının yerel IP'sini yazmalısın.
+    // Şimdilik 10.0.2.2 kullanıyorum (Android Emülatörü için localhost karşılığı).
+    // Fiziksel cihaz için "192.168.1.X" gibi bir adres yazmalısın.
+	private readonly string _baseUrl = "http://localhost:5119";
 	private DateTime _currentViewDate = DateTime.Today;
 	private bool _isGlowBreathing = false;
 	private Color _currentGlowColor = Colors.Transparent;
@@ -34,7 +39,38 @@ public partial class MainPage : ContentPage, INotifyPropertyChanged
         InitializeComponent();
         BindingContext = this;
     }
+    
+    private async Task<string> GetOrCreateTokenAsync()
+    {
+        var existingToken = await SecureStorage.Default.GetAsync("auth_token");
+        
+        if (!string.IsNullOrEmpty(existingToken))
+        {
+            return existingToken; 
+        }
 
+        var response = await _httpClient.PostAsync($"{_baseUrl}/api/token", null);
+        response.EnsureSuccessStatusCode();
+
+        var authResult = await response.Content.ReadFromJsonAsync<AuthResponseDto>();
+        
+        if(authResult != null && !string.IsNullOrEmpty(authResult.Token))
+        {
+             await SecureStorage.Default.SetAsync("auth_token", authResult.Token);
+             return authResult.Token;
+        }
+        
+        return string.Empty;
+    }
+    
+    private async Task EnsureAuthorizedClient()
+    {
+        var token = await GetOrCreateTokenAsync();
+        if(!string.IsNullOrEmpty(token))
+        {
+             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+        }
+    }
 	private async void OnSortClicked(object? sender, EventArgs e)
 	{
 		if (FoodItems.Count == 0) return;
@@ -81,8 +117,10 @@ public partial class MainPage : ContentPage, INotifyPropertyChanged
 
 		try
 		{
+            await EnsureAuthorizedClient();
+
 			string dateQuery = _currentViewDate.ToString("yyyy-MM-dd");
-			string url = $"http://localhost:5119/api/analyze-food?date={dateQuery}";
+			string url = $"{_baseUrl}/api/analyze-food?date={dateQuery}";
 
 			var response = await _httpClient.PostAsJsonAsync(url, userInput);
 
@@ -130,7 +168,8 @@ public partial class MainPage : ContentPage, INotifyPropertyChanged
 			FoodItems.Remove(selectedFood);
 			RecalculateTotals();
 			
-			await _httpClient.DeleteAsync($"http://localhost:5119/api/delete-food/{selectedFood.Id}");
+            await EnsureAuthorizedClient();
+			await _httpClient.DeleteAsync($"{_baseUrl}/api/delete-food/{selectedFood.Id}");
 		}
 		else if (action == "Gramajı Ayarla")
 		{
@@ -169,7 +208,8 @@ public partial class MainPage : ContentPage, INotifyPropertyChanged
 				FoodItems[index] = updatedFood;
 				RecalculateTotals();
 
-				await _httpClient.PutAsJsonAsync($"http://localhost:5119/api/update-food/{updatedFood.Id}", updatedFood);
+                await EnsureAuthorizedClient();
+				await _httpClient.PutAsJsonAsync($"{_baseUrl}/api/update-food/{updatedFood.Id}", updatedFood);
 			}
 		}
 		else if (action == "Öğünü Değiştir")
@@ -196,7 +236,8 @@ public partial class MainPage : ContentPage, INotifyPropertyChanged
 				int index = FoodItems.IndexOf(selectedFood);
 				FoodItems[index] = updatedFood;
 
-				await _httpClient.PutAsJsonAsync($"http://localhost:5119/api/update-food/{updatedFood.Id}", updatedFood);
+                await EnsureAuthorizedClient();
+				await _httpClient.PutAsJsonAsync($"{_baseUrl}/api/update-food/{updatedFood.Id}", updatedFood);
 			}
 		}
 
@@ -219,8 +260,10 @@ public partial class MainPage : ContentPage, INotifyPropertyChanged
 
 		try
 		{
+            await EnsureAuthorizedClient();
+
 			string dateString = targetDate.ToString("yyyy-MM-dd");
-			var savedFoods = await _httpClient.GetFromJsonAsync<List<FoodItemDto>>($"http://localhost:5119/api/get-foods/{dateString}");
+			var savedFoods = await _httpClient.GetFromJsonAsync<List<FoodItemDto>>($"{_baseUrl}/api/get-foods/{dateString}");
 
 			if (savedFoods != null)
 			{
