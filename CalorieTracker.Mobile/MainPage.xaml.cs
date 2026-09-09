@@ -27,6 +27,7 @@ public partial class MainPage : ContentPage, INotifyPropertyChanged
 	private DateTime _currentViewDate = DateTime.Today;
 	private bool _isGlowBreathing = false;
 	private Color _currentGlowColor = Colors.Transparent;
+	private int _dateChangeClickCount = 0;
 
     public MainPage()
     {
@@ -251,15 +252,30 @@ public partial class MainPage : ContentPage, INotifyPropertyChanged
 	private async void OnPrevDayClicked(object? sender, EventArgs e)
 	{
 		_currentViewDate = _currentViewDate.AddDays(-1);
-		await LoadFoodsForDate(_currentViewDate);
+		
+		var currentClick = ++_dateChangeClickCount;
+
+		await Task.Delay(300);
+
+		if (currentClick == _dateChangeClickCount)
+		{
+			await LoadFoodsForDate(_currentViewDate);
+		}
 	}
 
 	private async void OnNextDayClicked(object? sender, EventArgs e)
 	{
 		_currentViewDate = _currentViewDate.AddDays(1);
-		await LoadFoodsForDate(_currentViewDate);
-	}
+		
+		var currentClick = ++_dateChangeClickCount;
 
+		await Task.Delay(300);
+
+		if (currentClick == _dateChangeClickCount)
+		{
+			await LoadFoodsForDate(_currentViewDate);
+		}
+	}
 	private void UpdateDynamicEffects(double totalCalories)
 	{
 		Color targetColor = GetTargetGlowColor(totalCalories);
