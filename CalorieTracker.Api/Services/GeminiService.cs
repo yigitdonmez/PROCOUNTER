@@ -16,6 +16,12 @@ public class GeminiService
 
     public async Task<List<FoodItemDto>> AnalyzeFoodAsync(string userInput)
     {
+        if (string.IsNullOrWhiteSpace(userInput))
+            throw new ArgumentException("Lütfen yediğiniz yemeği yazın.");
+
+        if (userInput.Length > 50)
+            throw new ArgumentException("Girdi çok uzun. Lütfen yemeğinizi maksimum 50 karakterle özetleyin.");
+
         var apiKey = _configuration["Gemini:ApiKey"];
         var url = $"https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent?key={apiKey}";
 
@@ -66,6 +72,19 @@ public class GeminiService
 
         var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
         if (string.IsNullOrWhiteSpace(jsonText)) return new List<FoodItemDto>();
-        return JsonSerializer.Deserialize<List<FoodItemDto>>(jsonText, options) ?? new List<FoodItemDto>();
+        var result = JsonSerializer.Deserialize<List<FoodItemDto>>(jsonText, options) ?? new List<FoodItemDto>();
+
+        foreach (var item in result)
+        {
+            if (item.Calories < 0 || item.Calories > 5000 ||
+                item.ProteinGrams < 0 || item.ProteinGrams > 500 ||
+                item.CarbsGrams < 0 || item.CarbsGrams > 500 ||
+                item.FatGrams < 0 || item.FatGrams > 500)
+            {
+                throw new InvalidOperationException("Hesaplanan değerler fiziksel sınırların dışında. Lütfen daha net bir ifade girin.");
+            }
+        }
+
+        return result;
     }
 }
