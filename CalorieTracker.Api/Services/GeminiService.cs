@@ -19,19 +19,22 @@ public class GeminiService
         if (string.IsNullOrWhiteSpace(userInput))
             throw new ArgumentException("Lütfen yediğiniz yemeği yazın.");
 
-        if (userInput.Length > 50)
-            throw new ArgumentException("Girdi çok uzun. Lütfen yemeğinizi maksimum 50 karakterle özetleyin.");
+        if (userInput.Length > 150)
+            throw new ArgumentException("Girdi çok uzun. Lütfen yemeğinizi maksimum 150 karakterle özetleyin.");
+
+        var sanitizedInput = userInput.Replace("\"", "").Replace("{", "").Replace("}", "").Trim();
 
         var apiKey = _configuration["Gemini:ApiKey"];
         var url = $"https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent?key={apiKey}";
 
-        var prompt = $@"
-        Kullanıcının girdiği metni analiz et: '{userInput}'
+        var systemInstruction = @"Sen bir kalori analiz motorusun. Kullanıcının verdiği metni incele.
         Tüm sayısal değerleri virgülden sonra en fazla 2 basamak olacak şekilde yuvarla.
-        JSON formatında bir dizi döndür. MealType için şu tam sayıları kullanmalısın:
-        0 = Sabah, 1 = Ogle, 2 = Aksam, 3 = AraOgun, 4 = BilinmeyenOgun. Kullanıcı metinde öğün belirtmişse mutlaka doğru sayıyı at, belirtmemişse 4 at.
+        SADECE JSON formatında bir dizi döndür. Başka hiçbir açıklama yazma.
+        MealType için şu tam sayıları kullan: 0 = Sabah, 1 = Ogle, 2 = Aksam, 3 = AraOgun, 4 = BilinmeyenOgun.
+        Kullanıcı öğün belirtmişse doğru sayıyı ata, belirtmemişse 4 ata.
+        Örnek Çıktı:
         [
-        {{
+        {
             ""OriginalQuery"": ""metin"",
             ""FoodName"": ""Yiyecek adı"",
             ""Portion"": ""Porsiyon"",
@@ -41,14 +44,18 @@ public class GeminiService
             ""FatGrams"": 8.2,
             ""MealType"": 2, 
             ""IsFound"": true
-        }}
+        }
         ]";
 
         var requestBody = new
         {
+            system_instruction = new
+            {
+                parts = new[] { new { text = systemInstruction } }
+            },
             contents = new[]
             {
-                new { parts = new[] { new { text = prompt } } }
+                new { role = "user", parts = new[] { new { text = sanitizedInput } } }
             },
             generationConfig = new { responseMimeType = "application/json" }
         };
@@ -57,7 +64,7 @@ public class GeminiService
 
         if (response.StatusCode == System.Net.HttpStatusCode.TooManyRequests)
         {
-            throw new Exception("Gemini API sınırına ulaşıldı. Lütfen 1 dakika bekleyip tekrar deneyin.");
+            throw new Exception("Gemini API sınırına ulaştı. Lütfen 1 dakika bekleyip tekrar deneyin.");
         }
 
         response.EnsureSuccessStatusCode();
@@ -72,6 +79,7 @@ public class GeminiService
 
         var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
         if (string.IsNullOrWhiteSpace(jsonText)) return new List<FoodItemDto>();
+
         var result = JsonSerializer.Deserialize<List<FoodItemDto>>(jsonText, options) ?? new List<FoodItemDto>();
 
         foreach (var item in result)
