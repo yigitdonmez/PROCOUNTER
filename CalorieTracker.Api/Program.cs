@@ -11,19 +11,21 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddHttpClient<GeminiService>();
 builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlite("Data Source=calories.db"));
 builder.Services.AddRateLimiter(options => {
-    options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(context =>
+    options.AddPolicy("GeminiLimit", context =>
         RateLimitPartition.GetFixedWindowLimiter(
             partitionKey: context.Connection.RemoteIpAddress?.ToString() ?? "unknown",
             factory: partition => new FixedWindowRateLimiterOptions
             {
                 AutoReplenishment = true,
                 PermitLimit = 10,
-                Window = TimeSpan.FromMinutes(1)
+                Window = TimeSpan.FromMinutes(1),
+                QueueLimit = 0
             }));
     options.RejectionStatusCode = 429;
 });
 
 var app = builder.Build();
+app.UseRouting();
 app.UseRateLimiter();
 
 app.MapPost("/api/analyze-food", async ([FromBody] string userInput, [FromQuery] string? date, GeminiService geminiService, AppDbContext dbContext) =>
@@ -52,7 +54,7 @@ app.MapPost("/api/analyze-food", async ([FromBody] string userInput, [FromQuery]
         return Results.Ok(result);
     }
     catch (Exception ex) { return Results.Problem(ex.Message); }
-});
+}).RequireRateLimiting("GeminiLimit");
 
 app.MapGet("/api/get-foods/{dateString}", async (string dateString, AppDbContext dbContext) =>
 {
