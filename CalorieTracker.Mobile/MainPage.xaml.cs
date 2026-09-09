@@ -266,11 +266,11 @@ public partial class MainPage : ContentPage, INotifyPropertyChanged
 
 		if (totalCalories >= 500 && GlowEffect.Opacity == 0)
 		{
-			GlowEffect.FadeTo(0.8, 1000, Easing.CubicOut);
+			GlowEffect.FadeToAsync(0.8, 1000, Easing.CubicOut);
 		}
 		else if (totalCalories < 500)
 		{
-			GlowEffect.FadeTo(0, 1000, Easing.CubicOut);
+			GlowEffect.FadeToAsync(0, 1000, Easing.CubicOut);
 			_isGlowBreathing = false;
 		}
 
@@ -336,15 +336,15 @@ public partial class MainPage : ContentPage, INotifyPropertyChanged
 		while (_isGlowBreathing)
 		{
 			await Task.WhenAll(
-				GlowEffect.ScaleTo(1.05, 1800, Easing.SinInOut),
-				GlowEffect.FadeTo(0.9, 1800, Easing.SinInOut)
+				GlowEffect.ScaleToAsync(1.05, 1800, Easing.SinInOut),
+				GlowEffect.FadeToAsync(0.9, 1800, Easing.SinInOut)
 			);
 
 			if (!_isGlowBreathing) break;
 
 			await Task.WhenAll(
-				GlowEffect.ScaleTo(0.95, 1800, Easing.SinInOut),
-				GlowEffect.FadeTo(0.6, 1800, Easing.SinInOut)
+				GlowEffect.ScaleToAsync(0.95, 1800, Easing.SinInOut),
+				GlowEffect.FadeToAsync(0.6, 1800, Easing.SinInOut)
 			);
 		}
 	}
