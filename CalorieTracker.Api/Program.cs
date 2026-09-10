@@ -19,7 +19,7 @@ var jwtKey = jwtSection["Key"]
 var jwtIssuer = jwtSection["Issuer"] ?? "CalorieTracker.Api";
 var jwtAudience = jwtSection["Audience"] ?? "CalorieTracker.Client";
 
-var jwtExpireDays = double.TryParse(jwtSection["ExpireDays"], out var d) ? d : 1825;
+var jwtExpireDays = double.TryParse(jwtSection["ExpireDays"], out var d) ? d : 30;
 
 builder.Services.AddHttpClient<GeminiService>();
 
@@ -137,6 +137,46 @@ app.MapPost("/api/token", () =>
     });
 }).RequireRateLimiting("TokenLimit");
 
+app.MapPost("/api/refresh-token", (
+    [FromBody] string oldToken) =>
+{
+    var tokenHandler = new JwtSecurityTokenHandler();
+    var key = Encoding.UTF8.GetBytes(jwtKey);
+
+    try
+    {
+        var principal = tokenHandler.ValidateToken(oldToken, new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidIssuer = jwtIssuer,
+            ValidateAudience = true,
+            ValidAudience = jwtAudience,
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(key),
+            ValidateLifetime = false 
+        }, out var validatedToken);
+
+        var userId = principal.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (string.IsNullOrEmpty(userId)) return Results.Unauthorized();
+
+        var claims = new List<Claim> { new(ClaimTypes.NameIdentifier, userId) };
+        var creds = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256);
+        var expires = DateTime.UtcNow.AddDays(jwtExpireDays);
+
+        var newToken = new JwtSecurityToken(jwtIssuer, jwtAudience, claims, expires: expires, signingCredentials: creds);
+
+        return Results.Ok(new AuthResponseDto
+        {
+            Token = tokenHandler.WriteToken(newToken),
+            UserId = userId,
+            ExpiresAtUtc = expires
+        });
+    }
+    catch
+    {
+        return Results.Unauthorized();
+    }
+}).RequireRateLimiting("TokenLimit");
 
 app.MapPost("/api/analyze-food", async (
     [FromBody] string userInput,
@@ -168,12 +208,6 @@ app.MapPost("/api/analyze-food", async (
             }
 
             dbContext.FoodItems.AddRange(result);
-
-            var thresholdDate = DateTime.Today.AddDays(-7);
-            var oldRecords = dbContext.FoodItems
-                .Where(f => f.UserId == userId && f.ConsumedDate < thresholdDate);
-            dbContext.FoodItems.RemoveRange(oldRecords);
-
             await dbContext.SaveChangesAsync();
         }
         return Results.Ok(result);
