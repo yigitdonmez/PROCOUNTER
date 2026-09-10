@@ -26,8 +26,7 @@ public partial class MainPage : ContentPage, INotifyPropertyChanged
     private readonly HttpClient _httpClient = new();
     
     // MAUI projesini fiziksel cihazda çalıştırırken localhost yerine bilgisayarının yerel IP'sini yazmalısın.
-    // Şimdilik 10.0.2.2 kullanıyorum (Android Emülatörü için localhost karşılığı).
-    // Fiziksel cihaz için "192.168.1.X" gibi bir adres yazmalısın.
+    // Fiziksel cihaz için "192.168.1.X" gibi bir adres yazılmalı daha sonra halledeceğim KENDİME NOT
 	private readonly string _baseUrl = "http://localhost:5119";
 	private DateTime _currentViewDate = DateTime.Today;
 	private bool _isGlowBreathing = false;
@@ -38,6 +37,7 @@ public partial class MainPage : ContentPage, INotifyPropertyChanged
     {
         InitializeComponent();
         BindingContext = this;
+		_httpClient = GetInsecureHttpClient(_baseUrl);
     }
     
     private async Task<string> GetOrCreateTokenAsync()
@@ -406,5 +406,17 @@ public partial class MainPage : ContentPage, INotifyPropertyChanged
 				GlowEffect.FadeToAsync(0.6, 1800, Easing.SinInOut)
 			);
 		}
+	}
+
+	private static HttpClient GetInsecureHttpClient(string baseUrl)
+	{
+		var insecureHandler = new HttpClientHandler();
+	#if DEBUG
+		insecureHandler.ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => true;
+	#endif
+
+		var refreshHandler = new TokenRefreshHandler(baseUrl, insecureHandler);
+
+		return new HttpClient(refreshHandler);
 	}
 }
