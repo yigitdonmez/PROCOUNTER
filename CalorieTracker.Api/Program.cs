@@ -295,4 +295,4 @@ app.MapPut("/api/update-food/{id}", async (
     return Results.Ok();
 }).RequireRateLimiting("WriteLimit").RequireAuthorization();
 
-app.Run();
+app.Run("[http://0.0.0.0:5119](http://0.0.0.0:5119)");

@@ -17,17 +17,14 @@ public class TokenRefreshHandler : DelegatingHandler
 
     protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
     {
-        // 1. Orijinal isteği gönder
         var response = await base.SendAsync(request, cancellationToken);
 
-        // 2. Eğer token süresi dolmuşsa (401 Unauthorized dönerse)
         if (response.StatusCode == HttpStatusCode.Unauthorized)
         {
             var oldToken = await SecureStorage.Default.GetAsync("auth_token");
             
             if (!string.IsNullOrEmpty(oldToken))
             {
-                // Geçici bir client ile yenileme isteği at
                 using var refreshClient = new HttpClient(new HttpClientHandler 
                 { 
                     ServerCertificateCustomValidationCallback = (m, c, ch, e) => true // Geliştirme ortamı için SSL atlama
@@ -41,10 +38,8 @@ public class TokenRefreshHandler : DelegatingHandler
                     
                     if (authResult != null && !string.IsNullOrEmpty(authResult.Token))
                     {
-                        // Yeni token'ı kaydet
                         await SecureStorage.Default.SetAsync("auth_token", authResult.Token);
 
-                        // Orijinal başarısız olan isteğin başlığını yeni token ile değiştir ve TEKRAR DENE
                         request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", authResult.Token);
                         response = await base.SendAsync(request, cancellationToken);
                     }

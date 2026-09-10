@@ -23,7 +23,7 @@ public partial class MainPage : ContentPage, INotifyPropertyChanged
     private double _totalFat;
     public double TotalFat { get => _totalFat; set { _totalFat = value; OnPropertyChanged(); } }
 
-    private readonly HttpClient _httpClient = new();
+    private readonly HttpClient _httpClient;
     
     // MAUI projesini fiziksel cihazda çalıştırırken localhost yerine bilgisayarının yerel IP'sini yazmalısın.
     // Fiziksel cihaz için "192.168.1.X" gibi bir adres yazılmalı daha sonra halledeceğim KENDİME NOT
@@ -33,11 +33,11 @@ public partial class MainPage : ContentPage, INotifyPropertyChanged
 	private Color _currentGlowColor = Colors.Transparent;
 	private int _dateChangeClickCount = 0;
 
-    public MainPage()
+    public MainPage(IHttpClientFactory httpClientFactory)
     {
         InitializeComponent();
         BindingContext = this;
-		_httpClient = GetInsecureHttpClient(_baseUrl);
+		_httpClient = httpClientFactory.CreateClient("CalorieApi");
     }
     
     private async Task<string> GetOrCreateTokenAsync()
@@ -49,7 +49,7 @@ public partial class MainPage : ContentPage, INotifyPropertyChanged
             return existingToken; 
         }
 
-        var response = await _httpClient.PostAsync($"{_baseUrl}/api/token", null);
+        var response = await _httpClient.PostAsync($"/api/token", null);
         response.EnsureSuccessStatusCode();
 
         var authResult = await response.Content.ReadFromJsonAsync<AuthResponseDto>();
@@ -120,9 +120,8 @@ public partial class MainPage : ContentPage, INotifyPropertyChanged
             await EnsureAuthorizedClient();
 
 			string dateQuery = _currentViewDate.ToString("yyyy-MM-dd");
-			string url = $"{_baseUrl}/api/analyze-food?date={dateQuery}";
 
-			var response = await _httpClient.PostAsJsonAsync(url, userInput);
+			var response = await _httpClient.PostAsJsonAsync($"/api/analyze-food?date={dateQuery}", userInput);
 
 			if (response.IsSuccessStatusCode)
 			{
@@ -169,7 +168,7 @@ public partial class MainPage : ContentPage, INotifyPropertyChanged
 			RecalculateTotals();
 			
             await EnsureAuthorizedClient();
-			await _httpClient.DeleteAsync($"{_baseUrl}/api/delete-food/{selectedFood.Id}");
+			await _httpClient.DeleteAsync($"/api/delete-food/{selectedFood.Id}");
 		}
 		else if (action == "Gramajı Ayarla")
 		{
@@ -209,7 +208,7 @@ public partial class MainPage : ContentPage, INotifyPropertyChanged
 				RecalculateTotals();
 
                 await EnsureAuthorizedClient();
-				await _httpClient.PutAsJsonAsync($"{_baseUrl}/api/update-food/{updatedFood.Id}", updatedFood);
+				await _httpClient.PutAsJsonAsync($"/api/update-food/{updatedFood.Id}", updatedFood);
 			}
 		}
 		else if (action == "Öğünü Değiştir")
@@ -237,7 +236,7 @@ public partial class MainPage : ContentPage, INotifyPropertyChanged
 				FoodItems[index] = updatedFood;
 
                 await EnsureAuthorizedClient();
-				await _httpClient.PutAsJsonAsync($"{_baseUrl}/api/update-food/{updatedFood.Id}", updatedFood);
+				await _httpClient.PutAsJsonAsync($"/api/update-food/{updatedFood.Id}", updatedFood);
 			}
 		}
 
@@ -263,7 +262,7 @@ public partial class MainPage : ContentPage, INotifyPropertyChanged
             await EnsureAuthorizedClient();
 
 			string dateString = targetDate.ToString("yyyy-MM-dd");
-			var savedFoods = await _httpClient.GetFromJsonAsync<List<FoodItemDto>>($"{_baseUrl}/api/get-foods/{dateString}");
+			var savedFoods = await _httpClient.GetFromJsonAsync<List<FoodItemDto>>($"/api/get-foods/{dateString}");
 
 			if (savedFoods != null)
 			{
@@ -271,7 +270,14 @@ public partial class MainPage : ContentPage, INotifyPropertyChanged
 				RecalculateTotals();
 			}
 		}
-		catch {}
+		catch (HttpRequestException)
+		{
+			await DisplayAlertAsync("Bağlantı Hatası", "Sunucuya ulaşılamıyor. Ağ bağlantınızı kontrol edin.", "Tamam");
+		}
+		catch (Exception ex)
+		{
+			await DisplayAlertAsync("Veri Hatası", $"Kayıtlar yüklenirken bir sorun oluştu: {ex.Message}", "Tamam");
+		}
 	}
 
 	private void UpdateDateUI()
@@ -408,15 +414,4 @@ public partial class MainPage : ContentPage, INotifyPropertyChanged
 		}
 	}
 
-	private static HttpClient GetInsecureHttpClient(string baseUrl)
-	{
-		var insecureHandler = new HttpClientHandler();
-	#if DEBUG
-		insecureHandler.ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => true;
-	#endif
-
-		var refreshHandler = new TokenRefreshHandler(baseUrl, insecureHandler);
-
-		return new HttpClient(refreshHandler);
-	}
 }
