@@ -9,8 +9,7 @@ public class TokenRefreshHandler : DelegatingHandler
 {
     private readonly string _baseUrl;
 
-    public TokenRefreshHandler(string baseUrl, HttpMessageHandler innerHandler) 
-        : base(innerHandler)
+    public TokenRefreshHandler(string baseUrl)
     {
         _baseUrl = baseUrl;
     }
@@ -27,7 +26,7 @@ public class TokenRefreshHandler : DelegatingHandler
             {
                 using var refreshClient = new HttpClient(new HttpClientHandler 
                 { 
-                    ServerCertificateCustomValidationCallback = (m, c, ch, e) => true // Geliştirme ortamı için SSL atlama
+                    ServerCertificateCustomValidationCallback = (m, c, ch, e) => true
                 });
                 
                 var refreshResponse = await refreshClient.PostAsJsonAsync($"{_baseUrl}/api/refresh-token", oldToken, cancellationToken);
