@@ -28,6 +28,7 @@ public class GeminiService
         var url = $"https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent?key={apiKey}";
 
         var systemInstruction = @"Sen bir kalori analiz motorusun. Kullanıcının verdiği metni incele.
+        Sadece yiyecek olan metinleri işleme al, tüketilemeyen içerikleri Geçersiz Yiyecek diye gir.
         Tüm sayısal değerleri virgülden sonra en fazla 2 basamak olacak şekilde yuvarla.
         SADECE JSON formatında bir dizi döndür. Başka hiçbir açıklama yazma.
         MealType için şu tam sayıları kullan: 0 = Sabah, 1 = Ogle, 2 = Aksam, 3 = AraOgun, 4 = BilinmeyenOgun.
