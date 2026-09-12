@@ -13,9 +13,6 @@ project.assets.json
 *.nuget.props
 *.nuget.targets
 
-appsettings.json
-appsettings.Development.json
-
 *.db
 *.db-shm
 *.db-wal
