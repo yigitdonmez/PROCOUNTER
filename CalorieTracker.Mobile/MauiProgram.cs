@@ -21,12 +21,12 @@ public static class MauiProgram
 #endif
 		builder.Services.AddTransient<TokenRefreshHandler>(sp => 
 		{
-			return new TokenRefreshHandler("http://localhost:5119");
+			return new TokenRefreshHandler("https://procounter.onrender.com");
 		});
 
 		builder.Services.AddHttpClient("CalorieApi", client =>
 		{
-			client.BaseAddress = new Uri("http://localhost:5119");
+			client.BaseAddress = new Uri("https://procounter.onrender.com");
 			client.Timeout = TimeSpan.FromSeconds(30);
 		})
 		.ConfigurePrimaryHttpMessageHandler(() =>
