@@ -24,7 +24,7 @@ var jwtExpireDays = double.TryParse(jwtSection["ExpireDays"], out var d) ? d : 3
 builder.Services.AddHttpClient<GeminiService>();
 
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlite("Data Source=calories.db"));
+    options.UseNpgsql(builder.Configuration.GetConnectionString("Default")));
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
