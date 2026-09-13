@@ -16,3 +16,5 @@ project.assets.json
 *.db
 *.db-shm
 *.db-wal
+
+Directory.Build.props
