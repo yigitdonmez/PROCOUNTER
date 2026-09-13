@@ -24,10 +24,6 @@ public partial class MainPage : ContentPage, INotifyPropertyChanged
     public double TotalFat { get => _totalFat; set { _totalFat = value; OnPropertyChanged(); } }
 
     private readonly HttpClient _httpClient;
-    
-    // MAUI projesini fiziksel cihazda çalıştırırken localhost yerine bilgisayarının yerel IP'sini yazmalısın.
-    // Fiziksel cihaz için "192.168.1.X" gibi bir adres yazılmalı daha sonra halledeceğim KENDİME NOT
-	private readonly string _baseUrl = "http://localhost:5119";
 	private DateTime _currentViewDate = DateTime.Today;
 	private bool _isGlowBreathing = false;
 	private Color _currentGlowColor = Colors.Transparent;
