@@ -34,6 +34,9 @@ public partial class MainPage : ContentPage, INotifyPropertyChanged
         InitializeComponent();
         BindingContext = this;
 		_httpClient = httpClientFactory.CreateClient("CalorieApi");
+
+		MainDatePicker.MaximumDate = DateTime.Today;
+		MainDatePicker.MinimumDate = DateTime.Today.AddYears(-1);
     }
     
     private async Task<string> GetOrCreateTokenAsync()
@@ -278,7 +281,7 @@ public partial class MainPage : ContentPage, INotifyPropertyChanged
 
 	private void UpdateDateUI()
 	{
-		bool canGoBack = _currentViewDate > DateTime.Today.AddDays(-7);
+		bool canGoBack = true; // always can go back for now
 		PrevDayButton.IsEnabled = canGoBack;
 		PrevDayButton.TextColor = canGoBack ? Color.FromArgb("#B900FF") : Color.FromArgb("#444444");
 		
@@ -310,6 +313,7 @@ public partial class MainPage : ContentPage, INotifyPropertyChanged
 
 	private async void OnNextDayClicked(object? sender, EventArgs e)
 	{
+		if (_currentViewDate.Date >= DateTime.Today) return;
 		_currentViewDate = _currentViewDate.AddDays(1);
 		
 		var currentClick = ++_dateChangeClickCount;
@@ -319,6 +323,7 @@ public partial class MainPage : ContentPage, INotifyPropertyChanged
 		if (currentClick == _dateChangeClickCount)
 		{
 			await LoadFoodsForDate(_currentViewDate);
+			MainDatePicker.Date = _currentViewDate;
 		}
 	}
 	private void UpdateDynamicEffects(double totalCalories)
@@ -410,4 +415,11 @@ public partial class MainPage : ContentPage, INotifyPropertyChanged
 		}
 	}
 
+	private async void OnDateSelected(object sender, DateChangedEventArgs e)
+	{
+		if (!e.NewDate.HasValue || _currentViewDate.Date == e.NewDate.Value.Date) return;
+
+		_currentViewDate = e.NewDate.Value.Date;
+		await LoadFoodsForDate(_currentViewDate);
+	}
 }

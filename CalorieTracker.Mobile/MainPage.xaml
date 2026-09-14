@@ -10,8 +10,11 @@
         <Grid Grid.Row="1" ColumnDefinitions="Auto, *, Auto" Margin="0,0,0,15" VerticalOptions="Center">
             <Button x:Name="PrevDayButton" Grid.Column="0" Text="&lt;" BackgroundColor="Transparent" TextColor="#B900FF" FontSize="28" FontAttributes="Bold" Clicked="OnPrevDayClicked" Padding="10,0"/>
             
-            <Label x:Name="DateLabel" Grid.Column="1" Text="BUGÜN" TextColor="#B900FF" FontSize="18" FontAttributes="Bold" CharacterSpacing="2" HorizontalOptions="Center" VerticalOptions="Center"/>
-            
+            <Grid Grid.Column="1" HorizontalOptions="Center" VerticalOptions="Center">
+                <Label x:Name="DateLabel" Text="BUGÜN" TextColor="#B900FF" FontSize="18" FontAttributes="Bold" CharacterSpacing="2" HorizontalOptions="Center" VerticalOptions="Center"/>
+                <DatePicker x:Name="MainDatePicker" Opacity="0" DateSelected="OnDateSelected" />
+            </Grid> 
+                       
             <Button x:Name="NextDayButton" Grid.Column="2" Text="&gt;" BackgroundColor="Transparent" TextColor="#B900FF" FontSize="28" FontAttributes="Bold" Clicked="OnNextDayClicked" Padding="10,0"/>
         </Grid> 
 

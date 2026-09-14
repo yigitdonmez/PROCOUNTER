@@ -18,3 +18,5 @@ project.assets.json
 *.db-wal
 
 Directory.Build.props
+
+*.txt
