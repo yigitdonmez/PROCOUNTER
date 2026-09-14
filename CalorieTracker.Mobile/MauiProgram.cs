@@ -39,6 +39,13 @@ public static class MauiProgram
 		})
 		.AddHttpMessageHandler<TokenRefreshHandler>();
 
+		Microsoft.Maui.Handlers.EntryHandler.Mapper.AppendToMapping("NoUnderline", (handler, view) =>
+		{
+		#if ANDROID
+			handler.PlatformView.SetBackgroundColor(Android.Graphics.Color.Transparent);
+		#endif
+		});
+
 		return builder.Build();
 	}
 }
