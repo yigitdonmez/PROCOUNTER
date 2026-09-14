@@ -1,30 +1,32 @@
 ﻿<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="CalorieTracker.Mobile.MainPage"
+             xmlns:strings="clr-namespace:CalorieTracker.Mobile.Resources.Strings;assembly=CalorieTracker.Mobile"             
              BackgroundColor="#0F0F13">
 
     <Grid RowDefinitions="Auto, Auto, Auto, Auto, Auto, *" Padding="15,5,15,0">
 
-        <Label Grid.Row="0" Text="PROCOUNTER" TextColor="#B900FF" FontSize="14" CharacterSpacing="10" HorizontalOptions="Center" Margin="0,0,0,10"/>
-
+        <Grid Grid.Row="0" ColumnDefinitions="Auto, *, Auto" Margin="0,0,0,10" VerticalOptions="Center">
+            <Button Grid.Column="0" Text="⋮" BackgroundColor="Transparent" TextColor="#B900FF" FontSize="26" FontAttributes="Bold" Padding="15,0" Clicked="OnSettingsClicked"/>
+            
+            <Label Grid.Column="1" Text="PROCOUNTER" TextColor="#B900FF" FontSize="14" CharacterSpacing="10" HorizontalOptions="Center" VerticalOptions="Center"/>
+            
+            <BoxView Grid.Column="2" WidthRequest="50" Color="Transparent"/>
+        </Grid>
+        
         <Grid Grid.Row="1" ColumnDefinitions="Auto, *, Auto" Margin="0,0,0,15" VerticalOptions="Center">
             <Button x:Name="PrevDayButton" Grid.Column="0" Text="&lt;" BackgroundColor="Transparent" TextColor="#B900FF" FontSize="28" FontAttributes="Bold" Clicked="OnPrevDayClicked" Padding="10,0"/>
             
             <Grid Grid.Column="1" HorizontalOptions="Center" VerticalOptions="Center">
-                <Label x:Name="DateLabel" Text="BUGÜN" TextColor="#B900FF" FontSize="18" FontAttributes="Bold" CharacterSpacing="2" HorizontalOptions="Center" VerticalOptions="Center"/>
+                <Label x:Name="DateLabel" Text="{x:Static strings:AppResources.Today}" TextColor="#B900FF" FontSize="18" FontAttributes="Bold" CharacterSpacing="2" HorizontalOptions="Center" VerticalOptions="Center"/>
                 <DatePicker x:Name="MainDatePicker" Opacity="0" DateSelected="OnDateSelected" />
             </Grid> 
-                       
+
             <Button x:Name="NextDayButton" Grid.Column="2" Text="&gt;" BackgroundColor="Transparent" TextColor="#B900FF" FontSize="28" FontAttributes="Bold" Clicked="OnNextDayClicked" Padding="10,0"/>
         </Grid> 
 
         <Grid Grid.Row="2" WidthRequest="0" HeightRequest="0" VerticalOptions="Center" HorizontalOptions="Center" ZIndex="-1">
-            <Ellipse x:Name="GlowEffect" 
-                    WidthRequest="400" HeightRequest="400" 
-                    HorizontalOptions="Center" VerticalOptions="Center"
-                    InputTransparent="True" 
-                    Opacity="0"
-                    Scale="0.9">
+            <Ellipse x:Name="GlowEffect" WidthRequest="400" HeightRequest="400" HorizontalOptions="Center" VerticalOptions="Center" InputTransparent="True" Opacity="0" Scale="0.9">
                 <Ellipse.Fill>
                     <RadialGradientBrush>
                         <GradientStop x:Name="GlowCenter" Color="Transparent" Offset="0.0" />
@@ -37,21 +39,21 @@
 
         <Grid Grid.Row="2" ColumnDefinitions="Auto, Auto" Margin="0,0,0,20" HorizontalOptions="Center" ColumnSpacing="30">
             <VerticalStackLayout Grid.Column="0" VerticalOptions="Center">
-                <Label Text="GÜNLÜK TOPLAM" TextColor="#888" FontSize="12" CharacterSpacing="2" HorizontalOptions="Center"/>
+                <Label Text="{x:Static strings:AppResources.DailyTotal}" TextColor="#888" FontSize="12" CharacterSpacing="2" HorizontalOptions="Center"/>
                 <Label Text="{Binding TotalCalories, StringFormat='{0:0.##}'}" TextColor="White" FontSize="56" FontAttributes="Bold" HorizontalOptions="Center"/>
-                <Label Text="KCAL" TextColor="#B900FF" FontSize="14" FontAttributes="Bold" HorizontalOptions="Center"/>
+                <Label Text="{x:Static strings:AppResources.Kcal}" TextColor="#B900FF" FontSize="14" FontAttributes="Bold" HorizontalOptions="Center"/>
             </VerticalStackLayout>
             <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="10">
                 <HorizontalStackLayout Spacing="15">
-                    <Label Text="PROTEİN" TextColor="#666" FontSize="12" FontAttributes="Bold" WidthRequest="60" VerticalOptions="Center"/>
+                    <Label Text="{x:Static strings:AppResources.Protein}" TextColor="#666" FontSize="12" FontAttributes="Bold" WidthRequest="60" VerticalOptions="Center"/>
                     <Label Text="{Binding TotalProtein, StringFormat='{0:0.##}g'}" TextColor="#00E5FF" FontSize="18" FontAttributes="Bold" VerticalOptions="Center"/>
                 </HorizontalStackLayout>
                 <HorizontalStackLayout Spacing="15">
-                    <Label Text="KARB" TextColor="#666" FontSize="12" FontAttributes="Bold" WidthRequest="60" VerticalOptions="Center"/>
+                    <Label Text="{x:Static strings:AppResources.Carbs}" TextColor="#666" FontSize="12" FontAttributes="Bold" WidthRequest="60" VerticalOptions="Center"/>
                     <Label Text="{Binding TotalCarbs, StringFormat='{0:0.##}g'}" TextColor="#00E5FF" FontSize="18" FontAttributes="Bold" VerticalOptions="Center"/>
                 </HorizontalStackLayout>
                 <HorizontalStackLayout Spacing="15">
-                    <Label Text="YAĞ" TextColor="#666" FontSize="12" FontAttributes="Bold" WidthRequest="60" VerticalOptions="Center"/>
+                    <Label Text="{x:Static strings:AppResources.Fat}" TextColor="#666" FontSize="12" FontAttributes="Bold" WidthRequest="60" VerticalOptions="Center"/>
                     <Label Text="{Binding TotalFat, StringFormat='{0:0.##}g'}" TextColor="#00E5FF" FontSize="18" FontAttributes="Bold" VerticalOptions="Center"/>
                 </HorizontalStackLayout>
             </VerticalStackLayout>
@@ -62,14 +64,14 @@
                 <RoundRectangle CornerRadius="12" />
             </Border.StrokeShape>
             <Grid ColumnDefinitions="*, Auto">
-                <Entry x:Name="FoodInput" Grid.Column="0" Placeholder="Örn: Akşam 1 porsiyon iskender" TextColor="White" PlaceholderColor="#555" BackgroundColor="Transparent"/>
-                <Button Grid.Column="1" Text="Ekle" BackgroundColor="#B900FF" TextColor="White" CornerRadius="8" FontAttributes="Bold" Clicked="OnAddFoodClicked"/>
+                <Entry x:Name="FoodInput" Grid.Column="0" Placeholder="{x:Static strings:AppResources.FoodInputPlaceholder}" TextColor="White" PlaceholderColor="#555" BackgroundColor="Transparent"/>
+                <Button Grid.Column="1" Text="{x:Static strings:AppResources.Add}" BackgroundColor="#B900FF" TextColor="White" CornerRadius="8" FontAttributes="Bold" Clicked="OnAddFoodClicked"/>
             </Grid>
         </Border>
 
         <Grid Grid.Row="4" ColumnDefinitions="*, Auto" Margin="0,0,0,10">
-            <Label Text="TÜKETİLENLER" TextColor="#888" FontSize="12" FontAttributes="Bold" VerticalOptions="Center" CharacterSpacing="1"/>
-            <Button Grid.Column="1" Text="Sırala ↕" BackgroundColor="#222" TextColor="White" FontSize="12" Padding="15,5" CornerRadius="6" Clicked="OnSortClicked"/>
+            <Label Text="{x:Static strings:AppResources.Consumed}" TextColor="#888" FontSize="12" FontAttributes="Bold" VerticalOptions="Center" CharacterSpacing="1"/>
+            <Button Grid.Column="1" Text="{x:Static strings:AppResources.Sort}" BackgroundColor="#222" TextColor="White" FontSize="12" Padding="15,5" CornerRadius="6" Clicked="OnSortClicked"/>
         </Grid>
 
         <CollectionView Grid.Row="5" ItemsSource="{Binding FoodItems}" SelectionMode="Single" SelectionChanged="OnFoodItemSelected">
@@ -80,14 +82,11 @@
                             <RoundRectangle CornerRadius="10" />
                         </Border.StrokeShape>
                         <Grid ColumnDefinitions="Auto, *, Auto">
-                            
                             <Label Grid.Column="0" Text="{Binding DisplayMealType}" HorizontalTextAlignment="Center" TextColor="#B900FF" FontSize="11" FontAttributes="Bold" VerticalOptions="Center" Margin="0,0,10,0" WidthRequest="45"/>
-                            
                             <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Margin="0,0,10,0">
                                 <Label Text="{Binding FoodName}" TextColor="White" FontSize="15" FontAttributes="Bold" LineBreakMode="TailTruncation" MaxLines="2"/>
                                 <Label Text="{Binding Portion}" TextColor="#888" FontSize="12"/>
                             </VerticalStackLayout>
-                            
                             <VerticalStackLayout Grid.Column="2" VerticalOptions="Center" Spacing="4" HorizontalOptions="End">
                                 <Label Text="{Binding Calories, StringFormat='{0:0.##} kcal'}" TextColor="#00E5FF" FontSize="14" FontAttributes="Bold" HorizontalOptions="End"/>
                                 <HorizontalStackLayout Spacing="6" HorizontalOptions="End">
@@ -96,7 +95,6 @@
                                     <Label Text="{Binding FatGrams, StringFormat='{0:0.##}Y'}" TextColor="#888" FontSize="11"/>
                                 </HorizontalStackLayout>
                             </VerticalStackLayout>
-                            
                         </Grid>
                     </Border>
                 </DataTemplate>

@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+    <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+    <resheader name="version"><value>2.0</value></resheader>
+    <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+    <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+    
+    <data name="Today" xml:space="preserve"><value>BUGÜN</value></data>
+    <data name="Yesterday" xml:space="preserve"><value>DÜN</value></data>
+    <data name="DailyTotal" xml:space="preserve"><value>GÜNLÜK TOPLAM</value></data>
+    <data name="Kcal" xml:space="preserve"><value>KCAL</value></data>
+    <data name="Protein" xml:space="preserve"><value>PROTEİN</value></data>
+    <data name="Carbs" xml:space="preserve"><value>KARB</value></data>
+    <data name="Fat" xml:space="preserve"><value>YAĞ</value></data>
+    <data name="FoodInputPlaceholder" xml:space="preserve"><value>Örn: Akşam 1 porsiyon iskender</value></data>
+    <data name="Add" xml:space="preserve"><value>Ekle</value></data>
+    <data name="Consumed" xml:space="preserve"><value>TÜKETİLENLER</value></data>
+    <data name="Sort" xml:space="preserve"><value>Sırala ↕</value></data>
+    <data name="SortCriteria" xml:space="preserve"><value>Sıralama Ölçütü</value></data>
+    <data name="Cancel" xml:space="preserve"><value>İptal</value></data>
+    <data name="ByMeal" xml:space="preserve"><value>Öğüne Göre</value></data>
+    <data name="ByCalorieDesc" xml:space="preserve"><value>Kaloriye Göre (En Yüksek)</value></data>
+    <data name="ByProteinDesc" xml:space="preserve"><value>Proteine Göre (En Yüksek)</value></data>
+    <data name="ByCarbsDesc" xml:space="preserve"><value>Karbonhidrata Göre (En Yüksek)</value></data>
+    <data name="ByFatDesc" xml:space="preserve"><value>Yağa Göre (En Yüksek)</value></data>
+    <data name="ByName" xml:space="preserve"><value>İsme Göre (A-Z)</value></data>
+    <data name="ApiError" xml:space="preserve"><value>API Hatası</value></data>
+    <data name="Code" xml:space="preserve"><value>Kodu</value></data>
+    <data name="Detail" xml:space="preserve"><value>Detay</value></data>
+    <data name="Ok" xml:space="preserve"><value>Tamam</value></data>
+    <data name="ConnectionError" xml:space="preserve"><value>Bağlantı Hatası</value></data>
+    <data name="ActionsFor" xml:space="preserve"><value>{0} İşlemleri</value></data>
+    <data name="Delete" xml:space="preserve"><value>Sil</value></data>
+    <data name="AdjustWeight" xml:space="preserve"><value>Gramajı Ayarla</value></data>
+    <data name="ChangeMeal" xml:space="preserve"><value>Öğünü Değiştir</value></data>
+    <data name="Current" xml:space="preserve"><value>Mevcut</value></data>
+    <data name="EnterNewAmount" xml:space="preserve"><value>Yeni miktarı girin</value></data>
+    <data name="SelectMeal" xml:space="preserve"><value>Öğün Seç</value></data>
+    <data name="Morning" xml:space="preserve"><value>Sabah</value></data>
+    <data name="Noon" xml:space="preserve"><value>Öğle</value></data>
+    <data name="Evening" xml:space="preserve"><value>Akşam</value></data>
+    <data name="Snack" xml:space="preserve"><value>Ara Öğün</value></data>
+    <data name="UnknownMeal" xml:space="preserve"><value>Bilinmeyen Öğün</value></data>
+    <data name="ServerUnreachable" xml:space="preserve"><value>Sunucuya ulaşılamıyor. Ağ bağlantınızı kontrol edin.</value></data>
+    <data name="DataError" xml:space="preserve"><value>Veri Hatası</value></data>
+    <data name="RecordsLoadError" xml:space="preserve"><value>Kayıtlar yüklenirken bir sorun oluştu:</value></data>
+</root>
