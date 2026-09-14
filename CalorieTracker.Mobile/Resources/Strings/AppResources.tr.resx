@@ -44,4 +44,6 @@
     <data name="ServerUnreachable" xml:space="preserve"><value>Sunucuya ulaşılamıyor. Ağ bağlantınızı kontrol edin.</value></data>
     <data name="DataError" xml:space="preserve"><value>Veri Hatası</value></data>
     <data name="RecordsLoadError" xml:space="preserve"><value>Kayıtlar yüklenirken bir sorun oluştu:</value></data>
+    <data name="Settings" xml:space="preserve"><value>Ayarlar</value></data>
+    <data name="Language" xml:space="preserve"><value>Dil</value></data>
 </root>

@@ -1,5 +1,6 @@
 using System.Reflection;
 using System.Resources;
+using System.Globalization;
 
 namespace CalorieTracker.Mobile.Resources.Strings;
 
@@ -8,7 +9,8 @@ public static class AppResources
     private static readonly ResourceManager ResourceManager = 
         new ResourceManager("CalorieTracker.Mobile.Resources.Strings.AppResources", typeof(AppResources).Assembly);
 
-    private static string GetString(string name) => ResourceManager.GetString(name) ?? name;
+    public static CultureInfo? Culture { get; set; }
+    private static string GetString(string name) => ResourceManager.GetString(name, Culture) ?? name;
 
     public static string Today => GetString("Today");
     public static string Yesterday => GetString("Yesterday");
@@ -49,4 +51,6 @@ public static class AppResources
     public static string ServerUnreachable => GetString("ServerUnreachable");
     public static string DataError => GetString("DataError");
     public static string RecordsLoadError => GetString("RecordsLoadError");
+    public static string Settings => GetString("Settings");
+    public static string Language => GetString("Language");
 }

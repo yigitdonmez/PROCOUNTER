@@ -44,4 +44,6 @@
     <data name="ServerUnreachable" xml:space="preserve"><value>Cannot reach the server. Check your network connection.</value></data>
     <data name="DataError" xml:space="preserve"><value>Data Error</value></data>
     <data name="RecordsLoadError" xml:space="preserve"><value>A problem occurred while loading records:</value></data>
+    <data name="Settings" xml:space="preserve"><value>Settings</value></data>
+    <data name="Language" xml:space="preserve"><value>Language</value></data>
 </root>
