@@ -17,28 +17,28 @@ public class GeminiService
     public async Task<List<FoodItemDto>> AnalyzeFoodAsync(string userInput)
     {
         if (string.IsNullOrWhiteSpace(userInput))
-            throw new ArgumentException("Lütfen yediğiniz yemeği yazın.");
+            throw new ArgumentException("Please enter the food you ate.");
 
         if (userInput.Length > 150)
-            throw new ArgumentException("Girdi çok uzun. Lütfen yemeğinizi maksimum 150 karakterle özetleyin.");
+            throw new ArgumentException("Input is too long. Please summarize your meal in a maximum of 150 characters.");
 
         var sanitizedInput = userInput.Replace("\"", "").Replace("{", "").Replace("}", "").Trim();
 
         var apiKey = _configuration["Gemini:ApiKey"];
         var url = $"https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent?key={apiKey}";
 
-        var systemInstruction = @"Sen bir kalori analiz motorusun. Kullanıcının verdiği metni incele.
-        Sadece yiyecek olan metinleri işleme al, tüketilemeyen içerikleri Geçersiz Yiyecek diye gir.
-        Tüm sayısal değerleri virgülden sonra en fazla 2 basamak olacak şekilde yuvarla.
-        SADECE JSON formatında bir dizi döndür. Başka hiçbir açıklama yazma.
-        MealType için şu tam sayıları kullan: 0 = Sabah, 1 = Ogle, 2 = Aksam, 3 = AraOgun, 4 = BilinmeyenOgun.
-        Kullanıcı öğün belirtmişse doğru sayıyı ata, belirtmemişse 4 ata.
-        Örnek Çıktı:
+        var systemInstruction = @"You are a calorie analysis engine. Analyze the text provided by the user.
+        Process only food-related items; categorize non-consumable items as Invalid Food.
+        Round all numerical values to a maximum of 2 decimal places.
+        Return an array STRICTLY in JSON format. Do not write any other explanations.
+        Use these integers for MealType: 0 = Breakfast, 1 = Lunch, 2 = Dinner, 3 = Snack, 4 = UnknownMeal.
+        If the user specifies a meal, assign the correct number; if not, assign 4.
+        Example Output:
         [
         {
-            ""OriginalQuery"": ""metin"",
-            ""FoodName"": ""Yiyecek adı"",
-            ""Portion"": ""Porsiyon"",
+            ""OriginalQuery"": ""text"",
+            ""FoodName"": ""Food name"",
+            ""Portion"": ""Portion"",
             ""Calories"": 250.5,
             ""ProteinGrams"": 12.5,
             ""CarbsGrams"": 30.0,
@@ -65,7 +65,7 @@ public class GeminiService
 
         if (response.StatusCode == System.Net.HttpStatusCode.TooManyRequests)
         {
-            throw new Exception("Gemini API sınırına ulaştı. Lütfen 1 dakika bekleyip tekrar deneyin.");
+            throw new Exception("Gemini API limit reached. Please wait 1 minute and try again.");
         }
 
         response.EnsureSuccessStatusCode();
@@ -90,7 +90,7 @@ public class GeminiService
                 item.CarbsGrams < 0 || item.CarbsGrams > 500 ||
                 item.FatGrams < 0 || item.FatGrams > 500)
             {
-                throw new InvalidOperationException("Hesaplanan değerler fiziksel sınırların dışında. Lütfen daha net bir ifade girin.");
+                throw new InvalidOperationException("Calculated values are outside physical limits. Please enter a clearer description.");
             }
         }
 

@@ -16,7 +16,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 var jwtSection = builder.Configuration.GetSection("Jwt");
 var jwtKey = jwtSection["Key"]
-    ?? throw new InvalidOperationException("Jwt:Key ayarı bulunamadı. 'dotnet user-secrets set \"Jwt:Key\" \"...\"' ile ekleyin.");
+    ?? throw new InvalidOperationException("Jwt:Key setting not found. Add it using 'dotnet user-secrets set \"Jwt:Key\" \"...\"'.");
 var jwtIssuer = jwtSection["Issuer"] ?? "CalorieTracker.Api";
 var jwtAudience = jwtSection["Audience"] ?? "CalorieTracker.Client";
 
@@ -191,7 +191,7 @@ app.MapPost("/api/analyze-food", async (
     var userId = principal.FindFirstValue(ClaimTypes.NameIdentifier);
     if (userId == null) return Results.Unauthorized();
 
-    if (string.IsNullOrWhiteSpace(userInput)) return Results.BadRequest("Boş olamaz.");
+    if (string.IsNullOrWhiteSpace(userInput)) return Results.BadRequest("Cannot be empty.");
 
     var targetDate = DateTime.TryParse(date, CultureInfo.InvariantCulture, DateTimeStyles.None, out var parsed)
         ? parsed.Date
@@ -223,8 +223,8 @@ app.MapPost("/api/analyze-food", async (
     }
     catch (Exception ex)
     {
-        logger.LogError(ex, "AnalyzeFood işlemi başarısız oldu. UserId: {UserId}", userId);
-        return Results.Problem("İstek işlenirken bir hata oluştu. Lütfen tekrar deneyin.", statusCode: 500);
+        logger.LogError(ex, "AnalyzeFood operation failed. UserId: {UserId}", userId);
+        return Results.Problem("An error occurred while processing the request. Please try again.", statusCode: 500);
     }
 }).RequireRateLimiting("GeminiLimit").RequireAuthorization();
 
@@ -237,7 +237,7 @@ app.MapGet("/api/get-foods/{dateString}", async (
     if (userId == null) return Results.Unauthorized();
 
     if (!DateTime.TryParse(dateString, CultureInfo.InvariantCulture, DateTimeStyles.None, out var targetDate))
-        return Results.BadRequest($"Geçersiz tarih formatı: {dateString}");
+        return Results.BadRequest($"Invalid date format: {dateString}");
 
     var foods = await dbContext.FoodItems
         .Where(f => f.UserId == userId && f.ConsumedDate == targetDate.Date)
@@ -275,9 +275,9 @@ app.MapPut("/api/update-food/{id}", async (
     if (userId == null) return Results.Unauthorized();
 
     if (updatedFood.Calories is < 0 or > 10000)
-        return Results.BadRequest("Kalori 0 ile 10000 arasında olmalıdır.");
+        return Results.BadRequest("Calories must be between 0 and 10000.");
     if (updatedFood.ProteinGrams < 0 || updatedFood.CarbsGrams < 0 || updatedFood.FatGrams < 0)
-        return Results.BadRequest("Makro değerleri negatif olamaz.");
+        return Results.BadRequest("Macro values cannot be negative.");
 
     var food = await dbContext.FoodItems
         .FirstOrDefaultAsync(f => f.Id == id && f.UserId == userId);
