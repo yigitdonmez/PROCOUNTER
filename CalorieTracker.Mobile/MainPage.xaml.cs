@@ -379,16 +379,25 @@ public partial class MainPage : ContentPage, INotifyPropertyChanged
 
 	private async void OnSettingsClicked(object? sender, EventArgs e)
 	{
-		string action = await DisplayActionSheet("Language / Dil", "Cancel / İptal", null, "English", "Türkçe");
+		string settingsAction = await DisplayActionSheetAsync("Ayarlar / Settings", "İptal / Cancel", null, "Dil / Language");
 
-		if (action == "English" || action == "Türkçe")
+		if (settingsAction == "Dil / Language")
 		{
-			string newLang = action == "English" ? "en" : "tr";
-			Preferences.Default.Set("AppLanguage", newLang);
-			
-			if (Application.Current != null)
+			string langAction = await DisplayActionSheetAsync("Language / Dil", "Cancel / İptal", null, "English", "Türkçe");
+
+			if (langAction == "English" || langAction == "Türkçe")
 			{
-				Application.Current.MainPage = new MainPage(_httpClientFactory);
+				string newLang = langAction == "English" ? "en" : "tr";
+				
+				if (Preferences.Default.Get("AppLanguage", "en") != newLang)
+				{
+					Preferences.Default.Set("AppLanguage", newLang);
+					
+					if (Application.Current != null)
+					{
+						Application.Current.Windows[0].Page = new MainPage(_httpClientFactory);
+					}
+				}
 			}
 		}
 	}

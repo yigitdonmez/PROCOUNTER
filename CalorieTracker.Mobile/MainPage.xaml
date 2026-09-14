@@ -7,13 +7,13 @@
     <Grid RowDefinitions="Auto, Auto, Auto, Auto, Auto, *" Padding="15,5,15,0">
 
         <Grid Grid.Row="0" ColumnDefinitions="Auto, *, Auto" Margin="0,0,0,10" VerticalOptions="Center">
-            <Button Grid.Column="0" Text="⋮" BackgroundColor="Transparent" TextColor="#B900FF" FontSize="26" FontAttributes="Bold" Padding="15,0" Clicked="OnSettingsClicked"/>
+            <Button Grid.Column="0" Text="⋮" BackgroundColor="Transparent" TextColor="#B900FF" FontSize="22" FontAttributes="Bold" Padding="10,0" Clicked="OnSettingsClicked"/>            
             
             <Label Grid.Column="1" Text="PROCOUNTER" TextColor="#B900FF" FontSize="14" CharacterSpacing="10" HorizontalOptions="Center" VerticalOptions="Center"/>
             
             <BoxView Grid.Column="2" WidthRequest="50" Color="Transparent"/>
         </Grid>
-        
+
         <Grid Grid.Row="1" ColumnDefinitions="Auto, *, Auto" Margin="0,0,0,15" VerticalOptions="Center">
             <Button x:Name="PrevDayButton" Grid.Column="0" Text="&lt;" BackgroundColor="Transparent" TextColor="#B900FF" FontSize="28" FontAttributes="Bold" Clicked="OnPrevDayClicked" Padding="10,0"/>
             
