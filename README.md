@@ -10,8 +10,8 @@ AI-powered, cross-platform calorie and macro-nutrient tracker built with .NET MA
 
 *(Add a short video or GIF here demonstrating the AI logging flow and the dynamic UI effects)*
 
-[![ProCounter Demo Video](https://img.youtube.com/vi/YOUR_VIDEO_ID/0.jpg)](https://www.youtube.com/watch?v=YOUR_VIDEO_ID)
-> Click the image above to watch the full demo video.
+<video src="https://github.com/yigitdonmez/PROCOUNTER/releases/download/v1.0.0/VID_20260916_181504.mp4" controls="controls" width="100%">
+</video>
 
 ---
 
