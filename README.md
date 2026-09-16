@@ -40,6 +40,7 @@ AI-powered, cross-platform calorie and macro-nutrient tracker built with .NET MA
 
 ### 🌐 Try It Live
 The `CalorieApi` HttpClient registered in `MauiProgram.cs` already points to the live, deployed backend on Render — no need to run your own API or database to try the app.
+Just download the `procounter_first_release.apk` file to your android device or follow the steps:
 
 1. Clone the repository.
 2. Open the solution and build/run the `CalorieTracker.Mobile` project on an emulator or device (see [Prerequisites](#prerequisites) below).
@@ -97,6 +98,7 @@ The `CalorieApi` HttpClient registered in `MauiProgram.cs` already points to the
 
 ### 🌐 Canlı Olarak Deneyin
 `MauiProgram.cs` içinde kayıtlı `CalorieApi` HttpClient'ı, Render üzerinde yayında olan gerçek backend'e zaten bağlı — uygulamayı denemek için kendi API'ni veya veritabanını çalıştırmana gerek yok.
+Sadece `procounter_first_release.apk` dosyasını android cihazınıza yükleyin ya da adımları izleyin:
 
 1. Repository'yi klonla.
 2. Solution'ı aç ve `CalorieTracker.Mobile` projesini bir emülatörde veya cihazda derleyip çalıştır (aşağıdaki [Gereksinimler](#gereksinimler) kısmına bak).
