@@ -5,6 +5,7 @@ using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using CalorieTracker.Shared;
 using CalorieTracker.Mobile.Resources.Strings;
+using System.Diagnostics;
 
 namespace CalorieTracker.Mobile;
 
@@ -27,7 +28,10 @@ public partial class MainPage : ContentPage, INotifyPropertyChanged
     private readonly HttpClient _httpClient;
     private readonly IHttpClientFactory _httpClientFactory;
     private DateTime _currentViewDate = DateTime.Today;
-    private bool _isGlowBreathing = false;
+    private readonly EqualizerDrawable _equalizer = new();
+    private IDispatcherTimer? _barsTimer;
+    private long _lastBarsTick;
+    private bool _barsWanted = false;
     private Color _currentGlowColor = Colors.Transparent;
     private int _dateChangeClickCount = 0;
 
@@ -51,6 +55,8 @@ public partial class MainPage : ContentPage, INotifyPropertyChanged
 
         MainDatePicker.MaximumDate = DateTime.Today;
         MainDatePicker.MinimumDate = DateTime.Today.AddYears(-1);
+
+        BarsView.Drawable = _equalizer;
     }
     
     private async Task<string> GetOrCreateTokenAsync()
@@ -261,7 +267,15 @@ public partial class MainPage : ContentPage, INotifyPropertyChanged
     protected override async void OnAppearing()
     {
         base.OnAppearing();
+        UpdateDynamicEffects(TotalCalories);
         await LoadFoodsForDate(_currentViewDate);
+    }
+
+    protected override void OnDisappearing()
+    {
+        base.OnDisappearing();
+        _barsWanted = false;
+        StopBars();
     }
 
     private async Task LoadFoodsForDate(DateTime targetDate)
@@ -295,12 +309,11 @@ public partial class MainPage : ContentPage, INotifyPropertyChanged
     {
         bool canGoBack = true; 
         PrevDayButton.IsEnabled = canGoBack;
-        PrevDayButton.TextColor = canGoBack ? Color.FromArgb("#B900FF") : Color.FromArgb("#444444");
+        PrevDayButton.TextColor = canGoBack ? Color.FromArgb("#1E63F0") : Color.FromArgb("#444444");
         
         bool canGoForward = _currentViewDate < DateTime.Today;
         NextDayButton.IsEnabled = canGoForward;
-        NextDayButton.TextColor = canGoForward ? Color.FromArgb("#B900FF") : Color.FromArgb("#444444");
-
+        NextDayButton.TextColor = canGoForward ? Color.FromArgb("#1E63F0") : Color.FromArgb("#444444");
         if (_currentViewDate == DateTime.Today) DateLabel.Text = AppResources.Today;
         else if (_currentViewDate == DateTime.Today.AddDays(-1)) DateLabel.Text = AppResources.Yesterday;
         else DateLabel.Text = _currentViewDate.ToString("dd MMMM dddd").ToUpper();
@@ -331,21 +344,26 @@ public partial class MainPage : ContentPage, INotifyPropertyChanged
 
     private void UpdateDynamicEffects(double totalCalories)
     {
-        Color targetColor = GetTargetGlowColor(totalCalories);
-
-        if (totalCalories >= 500 && GlowEffect.Opacity == 0) GlowEffect.FadeToAsync(0.8, 1000, Easing.CubicOut);
-        else if (totalCalories < 500)
+        if (totalCalories < 500)
         {
-            GlowEffect.FadeToAsync(0, 1000, Easing.CubicOut);
-            _isGlowBreathing = false;
+            _barsWanted = false;
+            _ = HideBarsAsync();
+            return;
         }
 
-        if (totalCalories >= 500) AnimateColorTransition(targetColor);
-        if (totalCalories >= 500 && !_isGlowBreathing)
-        {
-            _isGlowBreathing = true;
-            StartBreathingAnimation();
-        }
+        _barsWanted = true;
+        _equalizer.Level = GetBarLevel(totalCalories);
+        AnimateColorTransition(GetTargetGlowColor(totalCalories));
+
+        if (BarsView.Opacity < 1) _ = BarsView.FadeToAsync(1, 600, Easing.CubicOut);
+        StartBars();
+    }
+
+    private double GetBarLevel(double calories)
+    {
+        if (calories < 500) return 0;
+        double t = Math.Clamp((calories - 500) / 2500.0, 0, 1);
+        return 0.30 + 0.70 * t;
     }
 
     private Color GetTargetGlowColor(double calories)
@@ -368,37 +386,50 @@ public partial class MainPage : ContentPage, INotifyPropertyChanged
     private void AnimateColorTransition(Color targetColor)
     {
         if (_currentGlowColor == targetColor) return;
-        var startColor = _currentGlowColor;
-        this.AbortAnimation("GlowColorAnim"); 
+        var startColor = _currentGlowColor.Alpha == 0 ? targetColor : _currentGlowColor;
+        this.AbortAnimation("GlowColorAnim");
 
         var animation = new Animation(v =>
         {
             var r = startColor.Red + (targetColor.Red - startColor.Red) * v;
             var g = startColor.Green + (targetColor.Green - startColor.Green) * v;
             var b = startColor.Blue + (targetColor.Blue - startColor.Blue) * v;
-            
+
             _currentGlowColor = Color.FromRgba(r, g, b, 1.0);
-            GlowCenter.Color = _currentGlowColor.WithAlpha(0.25f); 
-            GlowMid.Color = _currentGlowColor.WithAlpha(0.08f);
+            _equalizer.BarColor = _currentGlowColor;
         }, 0, 1);
 
         animation.Commit(this, "GlowColorAnim", 16, 800, Easing.CubicOut);
     }
 
-    private async void StartBreathingAnimation()
+    private void StartBars()
     {
-        while (_isGlowBreathing)
+        if (_barsTimer == null)
         {
-            await Task.WhenAll(
-                GlowEffect.ScaleToAsync(1.05, 1800, Easing.SinInOut),
-                GlowEffect.FadeToAsync(0.9, 1800, Easing.SinInOut)
-            );
-            if (!_isGlowBreathing) break;
-            await Task.WhenAll(
-                GlowEffect.ScaleToAsync(0.95, 1800, Easing.SinInOut),
-                GlowEffect.FadeToAsync(0.6, 1800, Easing.SinInOut)
-            );
+            _barsTimer = Dispatcher.CreateTimer();
+            _barsTimer.Interval = TimeSpan.FromMilliseconds(40);   // ~25 fps
+            _barsTimer.Tick += (s, e) =>
+            {
+                long now = Stopwatch.GetTimestamp();
+                float dt = (float)((now - _lastBarsTick) / (double)Stopwatch.Frequency);
+                _lastBarsTick = now;
+
+                _equalizer.Tick(Math.Min(dt, 0.1f));
+                BarsView.Invalidate();
+            };
         }
+
+        if (_barsTimer.IsRunning) return;
+        _lastBarsTick = Stopwatch.GetTimestamp();
+        _barsTimer.Start();
+    }
+
+    private void StopBars() => _barsTimer?.Stop();
+
+    private async Task HideBarsAsync()
+    {
+        await BarsView.FadeToAsync(0, 600, Easing.CubicOut);
+        if (!_barsWanted) StopBars();
     }
 
     private async void OnDateSelected(object? sender, DateChangedEventArgs e)

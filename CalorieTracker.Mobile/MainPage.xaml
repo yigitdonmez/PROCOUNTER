@@ -1,101 +1,299 @@
-﻿<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="CalorieTracker.Mobile.MainPage"
              xmlns:strings="clr-namespace:CalorieTracker.Mobile.Resources.Strings;assembly=CalorieTracker.Mobile"
              xmlns:converters="clr-namespace:CalorieTracker.Mobile.Converters;assembly=CalorieTracker.Mobile"
-             BackgroundColor="#0F0F13">
+             BackgroundColor="#F3F7FD">
 
     <ContentPage.Resources>
         <ResourceDictionary>
             <converters:MealTypeConverter x:Key="MealConverter" />
+
+            <!-- Tema renkleri: tek yerden değiştirebilirsin -->
+            <Color x:Key="PrimaryBlue">#1E63F0</Color>
+            <Color x:Key="DeepBlue">#0B2E7A</Color>
+            <Color x:Key="SkyBlue">#E6EFFE</Color>
+            <Color x:Key="AccentYellow">#FFC93C</Color>
+            <Color x:Key="InkText">#0F1B3D</Color>
+            <Color x:Key="MutedText">#6B7A99</Color>
+            <Color x:Key="CardBorder">#DDE7FA</Color>
         </ResourceDictionary>
     </ContentPage.Resources>
 
-    <Grid RowDefinitions="Auto, Auto, Auto, Auto, Auto, *" Padding="15,5,15,0">
+    <Grid RowDefinitions="Auto, Auto, Auto, Auto, Auto, *" Padding="16,8,16,0">
 
-        <Grid Grid.Row="0" Margin="0,0,0,10" VerticalOptions="Center">
-            <Label Text="PROCOUNTER" TextColor="#B900FF" FontSize="14" CharacterSpacing="10" HorizontalOptions="Center" VerticalOptions="Center"/>
-            
-            <Button Text="⋮" BackgroundColor="Transparent" TextColor="#B900FF" FontSize="22" FontAttributes="Bold" Padding="10,0" HorizontalOptions="Start" Clicked="OnSettingsClicked"/>
+        <!-- Row 0: Başlık + ayarlar -->
+        <Grid Grid.Row="0" Margin="0,0,0,8" VerticalOptions="Center">
+            <Label Text="PROCOUNTER"
+                   TextColor="{StaticResource DeepBlue}"
+                   FontFamily="OpenSansSemibold"
+                   FontSize="15"
+                   CharacterSpacing="8"
+                   HorizontalOptions="Center"
+                   VerticalOptions="Center"/>
+
+            <Button Text="⋮"
+                    BackgroundColor="Transparent"
+                    TextColor="{StaticResource PrimaryBlue}"
+                    FontSize="24"
+                    FontAttributes="Bold"
+                    Padding="10,0"
+                    HorizontalOptions="Start"
+                    Clicked="OnSettingsClicked"/>
         </Grid>
 
-        <Grid Grid.Row="1" ColumnDefinitions="Auto, *, Auto" Margin="0,0,0,15" VerticalOptions="Center">
-            <Button x:Name="PrevDayButton" Grid.Column="0" Text="&lt;" BackgroundColor="Transparent" TextColor="#B900FF" FontSize="28" FontAttributes="Bold" Clicked="OnPrevDayClicked" Padding="10,0"/>
-            <Grid Grid.Column="1" HorizontalOptions="Center" VerticalOptions="Center">
-                <Label x:Name="DateLabel" Text="{x:Static strings:AppResources.Today}" TextColor="#B900FF" FontSize="18" FontAttributes="Bold" CharacterSpacing="2" HorizontalOptions="Center" VerticalOptions="Center"/>
-                <DatePicker x:Name="MainDatePicker" Opacity="0" DateSelected="OnDateSelected" />
-            </Grid> 
-            <Button x:Name="NextDayButton" Grid.Column="2" Text="&gt;" BackgroundColor="Transparent" TextColor="#B900FF" FontSize="28" FontAttributes="Bold" Clicked="OnNextDayClicked" Padding="10,0"/>
-        </Grid> 
+        <!-- Row 1: Tarih seçici -->
+        <Grid Grid.Row="1" ColumnDefinitions="Auto, *, Auto" Margin="0,0,0,14" VerticalOptions="Center">
+            <Button x:Name="PrevDayButton"
+                    Grid.Column="0"
+                    Text="&lt;"
+                    BackgroundColor="{StaticResource SkyBlue}"
+                    TextColor="{StaticResource PrimaryBlue}"
+                    FontSize="20"
+                    FontAttributes="Bold"
+                    WidthRequest="44"
+                    HeightRequest="44"
+                    CornerRadius="22"
+                    Padding="0"
+                    Clicked="OnPrevDayClicked"/>
 
-        <Grid Grid.Row="2" WidthRequest="0" HeightRequest="0" VerticalOptions="Center" HorizontalOptions="Center" ZIndex="-1">
-            <Ellipse x:Name="GlowEffect" WidthRequest="400" HeightRequest="400" HorizontalOptions="Center" VerticalOptions="Center" InputTransparent="True" Opacity="0" Scale="0.9">
-                <Ellipse.Fill>
-                    <RadialGradientBrush>
-                        <GradientStop x:Name="GlowCenter" Color="Transparent" Offset="0.0" />
-                        <GradientStop x:Name="GlowMid" Color="Transparent" Offset="0.45" />
-                        <GradientStop Color="Transparent" Offset="1.0" />
-                    </RadialGradientBrush>
-                </Ellipse.Fill>
-            </Ellipse>
+            <Border Grid.Column="1"
+                    HorizontalOptions="Center"
+                    VerticalOptions="Center"
+                    BackgroundColor="White"
+                    Stroke="{StaticResource CardBorder}"
+                    StrokeThickness="1"
+                    Padding="20,9">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="22" />
+                </Border.StrokeShape>
+                <Grid HorizontalOptions="Center" VerticalOptions="Center">
+                    <Label x:Name="DateLabel"
+                           Text="{x:Static strings:AppResources.Today}"
+                           TextColor="{StaticResource DeepBlue}"
+                           FontFamily="OpenSansSemibold"
+                           FontSize="15"
+                           CharacterSpacing="1"
+                           HorizontalOptions="Center"
+                           VerticalOptions="Center"/>
+                    <DatePicker x:Name="MainDatePicker" Opacity="0" DateSelected="OnDateSelected" />
+                </Grid>
+            </Border>
+
+            <Button x:Name="NextDayButton"
+                    Grid.Column="2"
+                    Text="&gt;"
+                    BackgroundColor="{StaticResource SkyBlue}"
+                    TextColor="{StaticResource PrimaryBlue}"
+                    FontSize="20"
+                    FontAttributes="Bold"
+                    WidthRequest="44"
+                    HeightRequest="44"
+                    CornerRadius="22"
+                    Padding="0"
+                    Clicked="OnNextDayClicked"/>
         </Grid>
 
-        <Grid Grid.Row="2" ColumnDefinitions="Auto, Auto" Margin="0,0,0,20" HorizontalOptions="Center" ColumnSpacing="30">
-            <VerticalStackLayout Grid.Column="0" VerticalOptions="Center">
-                <Label Text="{x:Static strings:AppResources.DailyTotal}" TextColor="#888" FontSize="12" CharacterSpacing="2" HorizontalOptions="Center"/>
-                <Label Text="{Binding TotalCalories, StringFormat='{0:0.##}'}" TextColor="White" FontSize="56" FontAttributes="Bold" HorizontalOptions="Center"/>
-                <Label Text="{x:Static strings:AppResources.Kcal}" TextColor="#B900FF" FontSize="14" FontAttributes="Bold" HorizontalOptions="Center"/>
-            </VerticalStackLayout>
-            <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="10">
-                <HorizontalStackLayout Spacing="15">
-                    <Label Text="{x:Static strings:AppResources.Protein}" TextColor="#666" FontSize="12" FontAttributes="Bold" WidthRequest="60" VerticalOptions="Center"/>
-                    <Label Text="{Binding TotalProtein, StringFormat='{0:0.##}g'}" TextColor="#00E5FF" FontSize="18" FontAttributes="Bold" VerticalOptions="Center"/>
-                </HorizontalStackLayout>
-                <HorizontalStackLayout Spacing="15">
-                    <Label Text="{x:Static strings:AppResources.Carbs}" TextColor="#666" FontSize="12" FontAttributes="Bold" WidthRequest="60" VerticalOptions="Center"/>
-                    <Label Text="{Binding TotalCarbs, StringFormat='{0:0.##}g'}" TextColor="#00E5FF" FontSize="18" FontAttributes="Bold" VerticalOptions="Center"/>
-                </HorizontalStackLayout>
-                <HorizontalStackLayout Spacing="15">
-                    <Label Text="{x:Static strings:AppResources.Fat}" TextColor="#666" FontSize="12" FontAttributes="Bold" WidthRequest="60" VerticalOptions="Center"/>
-                    <Label Text="{Binding TotalFat, StringFormat='{0:0.##}g'}" TextColor="#00E5FF" FontSize="18" FontAttributes="Bold" VerticalOptions="Center"/>
-                </HorizontalStackLayout>
-            </VerticalStackLayout>
-        </Grid>
-
-        <Border Grid.Row="3" BackgroundColor="#1E1E24" Padding="5" Stroke="Transparent" StrokeThickness="0" Margin="0,0,0,15">
+        <!-- Row 2: Özet kartı (glow efekti kartın içinde kalır, Border kırpar) -->
+        <Grid Grid.Row="2" Margin="0,0,0,16">
+        <!-- Sadece gölge katmanı: animasyonlu içerikten ayrı olsun ki her karede gölge yeniden hesaplanmasın -->
+        <Border BackgroundColor="#0B2E7A" StrokeThickness="0" Stroke="Transparent">
             <Border.StrokeShape>
-                <RoundRectangle CornerRadius="12" />
+                <RoundRectangle CornerRadius="24" />
             </Border.StrokeShape>
-            <Grid ColumnDefinitions="*, Auto">
-                <Entry x:Name="FoodInput" Grid.Column="0" Placeholder="{x:Static strings:AppResources.FoodInputPlaceholder}" TextColor="White" PlaceholderColor="#555" BackgroundColor="Transparent"/>
-                <Button Grid.Column="1" Text="{x:Static strings:AppResources.Add}" BackgroundColor="#B900FF" TextColor="White" CornerRadius="8" FontAttributes="Bold" Clicked="OnAddFoodClicked"/>
+            <Border.Shadow>
+                <Shadow Brush="#1E63F0" Opacity="0.30" Radius="18" Offset="0,8" />
+            </Border.Shadow>
+        </Border>
+
+        <Border Padding="0" StrokeThickness="0" Stroke="Transparent">
+            <Border.Background>
+                <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                    <GradientStop Color="#2F7BFF" Offset="0.0" />
+                    <GradientStop Color="#0B2E7A" Offset="1.0" />
+                </LinearGradientBrush>
+            </Border.Background>
+            <Border.StrokeShape>
+                <RoundRectangle CornerRadius="24" />
+            </Border.StrokeShape>
+            <Grid>
+
+                <Grid ColumnDefinitions="*, Auto" ColumnSpacing="16" Padding="20,18,20,0">
+                    <!-- Equalizer: sadece kalori sayacının altında 3 bar, kartın alt kenarından yükselir -->
+                    <GraphicsView x:Name="BarsView"
+                                  Grid.Column="0"
+                                  VerticalOptions="End"
+                                  HorizontalOptions="Center"
+                                  WidthRequest="72"
+                                  HeightRequest="64"
+                                  InputTransparent="True"
+                                  Opacity="0" />
+
+                    <VerticalStackLayout Grid.Column="0" VerticalOptions="Center" Margin="0,0,0,18">
+                        <Label Text="{x:Static strings:AppResources.DailyTotal}"
+                               TextColor="#BBD0FF"
+                               FontSize="11"
+                               FontAttributes="Bold"
+                               CharacterSpacing="2"
+                               HorizontalOptions="Center"/>
+                        <Label Text="{Binding TotalCalories, StringFormat='{0:0.##}'}"
+                               TextColor="White"
+                               FontFamily="OpenSansSemibold"
+                               FontSize="45"
+                               HorizontalOptions="Center"/>
+                        <Label Text="{x:Static strings:AppResources.Kcal}"
+                               TextColor="{StaticResource AccentYellow}"
+                               FontFamily="OpenSansSemibold"
+                               FontSize="14"
+                               HorizontalOptions="Center"/>
+                    </VerticalStackLayout>
+
+                    <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="8" Margin="0,0,0,18">
+                        <Border BackgroundColor="#22FFFFFF" StrokeThickness="0" Padding="12,7">
+                            <Border.StrokeShape><RoundRectangle CornerRadius="12" /></Border.StrokeShape>
+                            <HorizontalStackLayout Spacing="10">
+                                <Label Text="{x:Static strings:AppResources.Protein}" TextColor="#BBD0FF" FontSize="11" FontAttributes="Bold" WidthRequest="58" VerticalOptions="Center"/>
+                                <Label Text="{Binding TotalProtein, StringFormat='{0:0.##}g'}" TextColor="{StaticResource AccentYellow}" FontFamily="OpenSansSemibold" FontSize="16" VerticalOptions="Center"/>
+                            </HorizontalStackLayout>
+                        </Border>
+                        <Border BackgroundColor="#22FFFFFF" StrokeThickness="0" Padding="12,7">
+                            <Border.StrokeShape><RoundRectangle CornerRadius="12" /></Border.StrokeShape>
+                            <HorizontalStackLayout Spacing="10">
+                                <Label Text="{x:Static strings:AppResources.Carbs}" TextColor="#BBD0FF" FontSize="11" FontAttributes="Bold" WidthRequest="58" VerticalOptions="Center"/>
+                                <Label Text="{Binding TotalCarbs, StringFormat='{0:0.##}g'}" TextColor="{StaticResource AccentYellow}" FontFamily="OpenSansSemibold" FontSize="16" VerticalOptions="Center"/>
+                            </HorizontalStackLayout>
+                        </Border>
+                        <Border BackgroundColor="#22FFFFFF" StrokeThickness="0" Padding="12,7">
+                            <Border.StrokeShape><RoundRectangle CornerRadius="12" /></Border.StrokeShape>
+                            <HorizontalStackLayout Spacing="10">
+                                <Label Text="{x:Static strings:AppResources.Fat}" TextColor="#BBD0FF" FontSize="11" FontAttributes="Bold" WidthRequest="58" VerticalOptions="Center"/>
+                                <Label Text="{Binding TotalFat, StringFormat='{0:0.##}g'}" TextColor="{StaticResource AccentYellow}" FontFamily="OpenSansSemibold" FontSize="16" VerticalOptions="Center"/>
+                            </HorizontalStackLayout>
+                        </Border>
+                    </VerticalStackLayout>
+                </Grid>
+            </Grid>
+        </Border>
+        </Grid>
+
+        <!-- Row 3: Yemek girişi -->
+        <Border Grid.Row="3"
+                BackgroundColor="White"
+                Stroke="{StaticResource CardBorder}"
+                StrokeThickness="1"
+                Padding="6"
+                Margin="0,0,0,16">
+            <Border.StrokeShape>
+                <RoundRectangle CornerRadius="16" />
+            </Border.StrokeShape>
+            <Grid ColumnDefinitions="*, Auto" ColumnSpacing="6">
+                <Entry x:Name="FoodInput"
+                       Grid.Column="0"
+                       Placeholder="{x:Static strings:AppResources.FoodInputPlaceholder}"
+                       TextColor="{StaticResource InkText}"
+                       PlaceholderColor="#9AA8C7"
+                       BackgroundColor="Transparent"
+                       VerticalOptions="Center"/>
+                <Button Grid.Column="1"
+                        Text="{x:Static strings:AppResources.Add}"
+                        BackgroundColor="{StaticResource AccentYellow}"
+                        TextColor="{StaticResource DeepBlue}"
+                        FontFamily="OpenSansSemibold"
+                        CornerRadius="12"
+                        HeightRequest="44"
+                        Padding="22,0"
+                        Clicked="OnAddFoodClicked"/>
             </Grid>
         </Border>
 
-        <Grid Grid.Row="4" ColumnDefinitions="*, Auto" Margin="0,0,0,10">
-            <Label Text="{x:Static strings:AppResources.Consumed}" TextColor="#888" FontSize="12" FontAttributes="Bold" VerticalOptions="Center" CharacterSpacing="1"/>
-            <Button Grid.Column="1" Text="{x:Static strings:AppResources.Sort}" BackgroundColor="#222" TextColor="White" FontSize="12" Padding="15,5" CornerRadius="6" Clicked="OnSortClicked"/>
+        <!-- Row 4: Liste başlığı + sırala -->
+        <Grid Grid.Row="4" ColumnDefinitions="*, Auto" Margin="2,0,2,10">
+            <Label Text="{x:Static strings:AppResources.Consumed}"
+                   TextColor="{StaticResource MutedText}"
+                   FontSize="12"
+                   FontAttributes="Bold"
+                   VerticalOptions="Center"
+                   CharacterSpacing="1"/>
+            <Button Grid.Column="1"
+                    Text="{x:Static strings:AppResources.Sort}"
+                    BackgroundColor="{StaticResource SkyBlue}"
+                    TextColor="{StaticResource PrimaryBlue}"
+                    FontFamily="OpenSansSemibold"
+                    FontSize="12"
+                    HeightRequest="34"
+                    Padding="16,0"
+                    CornerRadius="10"
+                    Clicked="OnSortClicked"/>
         </Grid>
 
+        <!-- Row 5: Yemek listesi -->
         <CollectionView Grid.Row="5" ItemsSource="{Binding FoodItems}" SelectionMode="Single" SelectionChanged="OnFoodItemSelected">
             <CollectionView.ItemTemplate>
                 <DataTemplate>
-                    <Border BackgroundColor="#16161A" Margin="0,0,0,10" Padding="12" Stroke="#222" StrokeThickness="1">
+                    <Border BackgroundColor="White"
+                            Margin="4,2,4,10"
+                            Padding="12"
+                            Stroke="{StaticResource CardBorder}"
+                            StrokeThickness="1">
                         <Border.StrokeShape>
-                            <RoundRectangle CornerRadius="10" />
+                            <RoundRectangle CornerRadius="16" />
                         </Border.StrokeShape>
+
+                        <VisualStateManager.VisualStateGroups>
+                            <VisualStateGroupList>
+                                <VisualStateGroup x:Name="CommonStates">
+                                    <VisualState x:Name="Normal" />
+                                    <VisualState x:Name="Selected">
+                                        <VisualState.Setters>
+                                            <Setter Property="BackgroundColor" Value="#E6EFFE" />
+                                        </VisualState.Setters>
+                                    </VisualState>
+                                </VisualStateGroup>
+                            </VisualStateGroupList>
+                        </VisualStateManager.VisualStateGroups>
+
                         <Grid ColumnDefinitions="Auto, *, Auto">
-                            <Label Grid.Column="0" Text="{Binding MealType, Converter={StaticResource MealConverter}}" HorizontalTextAlignment="Center" TextColor="#B900FF" FontSize="10" FontAttributes="Bold" VerticalOptions="Center" Margin="0,0,10,0" WidthRequest="55"/>
-                            <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Margin="0,0,10,0">
-                                <Label Text="{Binding FoodName}" TextColor="White" FontSize="15" FontAttributes="Bold" LineBreakMode="TailTruncation" MaxLines="2"/>
-                                <Label Text="{Binding Portion}" TextColor="#888" FontSize="12"/>
+                            <!-- Öğün rozeti -->
+                            <Border Grid.Column="0"
+                                    BackgroundColor="{StaticResource SkyBlue}"
+                                    StrokeThickness="0"
+                                    Padding="4,6"
+                                    WidthRequest="64"
+                                    VerticalOptions="Center"
+                                    Margin="0,0,12,0">
+                                <Border.StrokeShape>
+                                    <RoundRectangle CornerRadius="10" />
+                                </Border.StrokeShape>
+                                <Label Text="{Binding MealType, Converter={StaticResource MealConverter}}"
+                                       HorizontalTextAlignment="Center"
+                                       TextColor="{StaticResource PrimaryBlue}"
+                                       FontFamily="OpenSansSemibold"
+                                       FontSize="10"/>
+                            </Border>
+
+                            <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Margin="0,0,10,0" Spacing="2">
+                                <Label Text="{Binding FoodName}"
+                                       TextColor="{StaticResource InkText}"
+                                       FontFamily="OpenSansSemibold"
+                                       FontSize="15"
+                                       LineBreakMode="TailTruncation"
+                                       MaxLines="2"/>
+                                <Label Text="{Binding Portion}"
+                                       TextColor="{StaticResource MutedText}"
+                                       FontSize="12"/>
                             </VerticalStackLayout>
+
                             <VerticalStackLayout Grid.Column="2" VerticalOptions="Center" Spacing="4" HorizontalOptions="End">
-                                <Label Text="{Binding Calories, StringFormat='{0:0.##} kcal'}" TextColor="#00E5FF" FontSize="14" FontAttributes="Bold" HorizontalOptions="End"/>
+                                <Label Text="{Binding Calories, StringFormat='{0:0.##} kcal'}"
+                                       TextColor="{StaticResource PrimaryBlue}"
+                                       FontFamily="OpenSansSemibold"
+                                       FontSize="14"
+                                       HorizontalOptions="End"/>
                                 <HorizontalStackLayout Spacing="6" HorizontalOptions="End">
-                                    <Label Text="{Binding ProteinGrams, StringFormat='{0:0.##}P'}" TextColor="#888" FontSize="11"/>
-                                    <Label Text="{Binding CarbsGrams, StringFormat='{0:0.##}C'}" TextColor="#888" FontSize="11"/>
-                                    <Label Text="{Binding FatGrams, StringFormat='{0:0.##}Y'}" TextColor="#888" FontSize="11"/>
+                                    <Label Text="{Binding ProteinGrams, StringFormat='{0:0.##}P'}" TextColor="{StaticResource MutedText}" FontSize="11"/>
+                                    <Label Text="{Binding CarbsGrams, StringFormat='{0:0.##}C'}" TextColor="{StaticResource MutedText}" FontSize="11"/>
+                                    <Label Text="{Binding FatGrams, StringFormat='{0:0.##}Y'}" TextColor="{StaticResource MutedText}" FontSize="11"/>
                                 </HorizontalStackLayout>
                             </VerticalStackLayout>
                         </Grid>
